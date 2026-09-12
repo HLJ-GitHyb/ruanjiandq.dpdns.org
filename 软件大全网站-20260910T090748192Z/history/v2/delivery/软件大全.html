@@ -1,0 +1,1759 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件大全 · 人人可发布，人人可下载</title>
+<meta name="description" content="一个开放的软件分享平台，任何人都能发布软件，任何人都能免费下载。">
+<!-- SECTION: supabase-sdk -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* SECTION: variables */
+:root{
+  --bg:#0b1020;
+  --bg-soft:#111a30;
+  --card:#151f38;
+  --card-hover:#1a2647;
+  --line:#25324f;
+  --line-soft:#1d2942;
+  --txt:#e8edf9;
+  --txt-2:#a3b0cc;
+  --txt-3:#6f7d9c;
+  --acc:#22d3ee;
+  --acc-2:#3b82f6;
+  --acc-soft:rgba(34,211,238,.12);
+  --ok:#34d399;
+  --warn:#fbbf24;
+  --err:#f87171;
+  --r:14px;
+  --r-sm:9px;
+  --sh:0 8px 28px rgba(0,0,0,.35);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+/* SECTION: reset */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--txt);
+  line-height:1.6;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(900px 420px at 12% -8%,rgba(59,130,246,.20),transparent 60%),
+    radial-gradient(760px 380px at 92% 4%,rgba(34,211,238,.14),transparent 62%);
+  background-attachment:fixed;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--acc);text-decoration:none}
+ul{list-style:none}
+svg{display:block;flex:none}
+::selection{background:rgba(34,211,238,.28)}
+/* SECTION: scrollbar */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#2a3855;border-radius:6px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:#37486b}
+/* SECTION: layout */
+.wrap{width:100%;max-width:1180px;margin:0 auto;padding:0 20px}
+/* SECTION: header */
+.hdr{
+  position:sticky;top:0;z-index:60;
+  background:rgba(11,16,32,.86);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-soft);
+}
+.hdr-in{display:flex;align-items:center;gap:14px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;flex:none;font-weight:700;font-size:18px;letter-spacing:.3px}
+.logo-badge{
+  width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--acc),var(--acc-2));
+  box-shadow:0 4px 14px rgba(34,211,238,.32);
+}
+.logo-badge svg{width:19px;height:19px;color:#06121f}
+.logo em{font-style:normal;background:linear-gradient(92deg,var(--acc),#93c5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hdr-nav{display:flex;align-items:center;gap:4px;margin-left:6px}
+.nav-btn{
+  padding:7px 13px;border-radius:8px;color:var(--txt-2);font-size:14px;font-weight:500;
+  transition:background .16s,color .16s;white-space:nowrap;
+}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:var(--txt)}
+.nav-btn.on{background:var(--acc-soft);color:var(--acc)}
+.hdr-sp{flex:1}
+.hdr-act{display:flex;align-items:center;gap:9px;flex:none}
+.me{display:flex;align-items:center;gap:9px}
+.me-avatar{
+  width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--acc),var(--acc-2));
+  color:#06121f;font-weight:700;font-size:14px;flex:none;
+}
+.me-name{font-size:14px;font-weight:600;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* SECTION: buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 16px;border-radius:9px;font-size:14px;font-weight:600;
+  transition:transform .12s,background .16s,box-shadow .16s,border-color .16s,opacity .16s;
+  white-space:nowrap;min-height:38px;
+}
+.btn svg{width:16px;height:16px}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-p{background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#06121f;box-shadow:0 4px 16px rgba(34,211,238,.26)}
+.btn-p:hover:not(:disabled){box-shadow:0 6px 22px rgba(34,211,238,.4)}
+.btn-g{background:rgba(255,255,255,.06);color:var(--txt);border:1px solid var(--line)}
+.btn-g:hover:not(:disabled){background:rgba(255,255,255,.1);border-color:#33436a}
+.btn-o{background:transparent;color:var(--txt-2);border:1px solid var(--line)}
+.btn-o:hover:not(:disabled){color:var(--txt);border-color:#33436a;background:rgba(255,255,255,.04)}
+.btn-d{background:rgba(248,113,113,.12);color:var(--err);border:1px solid rgba(248,113,113,.28)}
+.btn-d:hover:not(:disabled){background:rgba(248,113,113,.2)}
+.btn-sm{padding:6px 12px;font-size:13px;min-height:32px}
+.btn-block{width:100%}
+/* SECTION: hero */
+.hero{padding:40px 0 26px;text-align:center}
+.hero h1{font-size:clamp(26px,4.6vw,40px);font-weight:800;letter-spacing:-.5px;line-height:1.25}
+.hero h1 em{font-style:normal;background:linear-gradient(92deg,var(--acc),#93c5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:11px auto 0;max-width:600px;color:var(--txt-2);font-size:15px}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px}
+.stat{
+  background:rgba(21,31,56,.72);border:1px solid var(--line-soft);border-radius:11px;
+  padding:9px 18px;min-width:104px;text-align:center;
+}
+.stat b{display:block;font-size:19px;font-weight:800;color:var(--acc);line-height:1.3}
+.stat span{font-size:12px;color:var(--txt-3)}
+/* SECTION: searchbar */
+.sbar{
+  display:flex;gap:10px;align-items:center;margin:0 auto 20px;max-width:660px;
+  background:var(--card);border:1px solid var(--line);border-radius:13px;padding:6px 6px 6px 15px;
+  transition:border-color .18s,box-shadow .18s;
+}
+.sbar:focus-within{border-color:rgba(34,211,238,.55);box-shadow:0 0 0 3px rgba(34,211,238,.12)}
+.sbar svg.si{width:18px;height:18px;color:var(--txt-3);flex:none}
+.sbar input{flex:1;min-width:0;background:none;border:none;outline:none;padding:8px 0;font-size:15px}
+.sbar input::placeholder{color:var(--txt-3)}
+/* SECTION: toolbar */
+.tbar{
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid var(--line-soft);
+}
+.chips{display:flex;gap:7px;flex-wrap:wrap;flex:1;min-width:0}
+.chip{
+  padding:6px 13px;border-radius:999px;font-size:13px;font-weight:500;
+  background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--txt-2);
+  transition:all .16s;white-space:nowrap;
+}
+.chip:hover{color:var(--txt);border-color:#33436a;background:rgba(255,255,255,.08)}
+.chip.on{background:var(--acc-soft);border-color:rgba(34,211,238,.42);color:var(--acc);font-weight:600}
+.sel{
+  background:var(--card);border:1px solid var(--line);border-radius:9px;
+  padding:7px 11px;font-size:13px;color:var(--txt-2);outline:none;cursor:pointer;min-height:34px;
+}
+.sel:focus{border-color:rgba(34,211,238,.5)}
+.sel option{background:var(--bg-soft);color:var(--txt)}
+/* SECTION: grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
+.card{
+  background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);
+  padding:17px;display:flex;flex-direction:column;gap:11px;
+  transition:transform .16s,border-color .16s,background .16s,box-shadow .16s;
+  position:relative;overflow:hidden;
+}
+.card::after{
+  content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(90deg,var(--acc),var(--acc-2));
+  opacity:0;transition:opacity .2s;
+}
+.card:hover{transform:translateY(-3px);border-color:#2e3d5e;background:var(--card-hover);box-shadow:var(--sh)}
+.card:hover::after{opacity:1}
+.card-top{display:flex;gap:12px;align-items:flex-start}
+.ico{
+  width:46px;height:46px;border-radius:11px;flex:none;display:grid;place-items:center;
+  font-size:19px;font-weight:800;color:#06121f;letter-spacing:-.5px;
+}
+.card-tt{min-width:0;flex:1}
+.card-name{
+  font-size:15.5px;font-weight:700;line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-word;
+}
+.card-ver{font-size:12px;color:var(--txt-3);margin-top:2px}
+.card-desc{
+  font-size:13px;color:var(--txt-2);line-height:1.55;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-word;min-height:20px;
+}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{
+  font-size:11.5px;padding:3px 9px;border-radius:6px;font-weight:500;
+  background:rgba(255,255,255,.05);color:var(--txt-2);border:1px solid var(--line-soft);
+}
+.tag.cat{background:var(--acc-soft);color:var(--acc);border-color:rgba(34,211,238,.2)}
+.card-ft{display:flex;align-items:center;gap:9px;margin-top:auto;padding-top:11px;border-top:1px solid var(--line-soft)}
+.meta{font-size:12px;color:var(--txt-3);display:flex;align-items:center;gap:4px;min-width:0}
+.meta svg{width:13px;height:13px}
+.meta .who{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:82px}
+.card-ft .btn{margin-left:auto}
+/* SECTION: skeleton */
+.sk{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);padding:17px}
+.sk-l{background:linear-gradient(90deg,#1a2540 25%,#22304f 50%,#1a2540 75%);background-size:200% 100%;animation:sh 1.25s infinite;border-radius:6px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk-ico{width:46px;height:46px;border-radius:11px}
+.sk-t{height:15px;width:62%}
+.sk-s{height:11px;width:38%;margin-top:7px}
+.sk-b{height:36px;margin-top:15px}
+/* SECTION: empty */
+.empty{text-align:center;padding:62px 20px;color:var(--txt-3)}
+.empty-ic{
+  width:66px;height:66px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center;
+  background:rgba(255,255,255,.04);border:1px solid var(--line-soft);
+}
+.empty-ic svg{width:30px;height:30px;color:var(--txt-3)}
+.empty h3{font-size:16.5px;color:var(--txt);font-weight:650;margin-bottom:6px}
+.empty p{font-size:13.5px;max-width:400px;margin:0 auto}
+.empty .btn{margin-top:18px}
+/* SECTION: loadmore */
+.more{display:flex;justify-content:center;padding:26px 0 8px}
+/* SECTION: footer */
+.ftr{
+  margin-top:52px;padding:24px 0;border-top:1px solid var(--line-soft);
+  text-align:center;color:var(--txt-3);font-size:12.5px;line-height:1.9;
+}
+.ftr a{color:var(--txt-2)}
+.ftr a:hover{color:var(--acc)}
+/* SECTION: modal */
+.msk{
+  position:fixed;inset:0;z-index:100;background:rgba(5,8,18,.76);
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:24px 16px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;
+}
+.msk.on{opacity:1;visibility:visible}
+.mdl{
+  background:var(--bg-soft);border:1px solid var(--line);border-radius:16px;
+  width:100%;max-width:520px;margin:auto;box-shadow:0 24px 64px rgba(0,0,0,.6);
+  transform:translateY(14px) scale(.985);transition:transform .22s cubic-bezier(.2,.8,.3,1);
+  position:relative;
+}
+.msk.on .mdl{transform:none}
+.mdl-hd{display:flex;align-items:flex-start;gap:12px;padding:19px 20px 15px;border-bottom:1px solid var(--line-soft)}
+.mdl-hd h2{font-size:17px;font-weight:700;line-height:1.4}
+.mdl-hd p{font-size:12.8px;color:var(--txt-3);margin-top:3px}
+.mdl-x{
+  margin-left:auto;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
+  color:var(--txt-3);transition:all .16s;flex:none;
+}
+.mdl-x:hover{background:rgba(255,255,255,.08);color:var(--txt)}
+.mdl-x svg{width:16px;height:16px}
+.mdl-bd{padding:18px 20px}
+.mdl-ft{padding:14px 20px 19px;display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+/* SECTION: form */
+.fld{margin-bottom:14px}
+.fld:last-child{margin-bottom:0}
+.lbl{display:block;font-size:13px;font-weight:600;color:var(--txt-2);margin-bottom:6px}
+.lbl .req{color:var(--acc);margin-left:2px}
+.lbl .opt{color:var(--txt-3);font-weight:400;font-size:12px;margin-left:4px}
+.inp{
+  width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:9px 12px;font-size:14px;outline:none;transition:border-color .16s,box-shadow .16s;
+}
+.inp:focus{border-color:rgba(34,211,238,.55);box-shadow:0 0 0 3px rgba(34,211,238,.1)}
+.inp::placeholder{color:var(--txt-3)}
+textarea.inp{resize:vertical;min-height:84px;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.hint{font-size:11.8px;color:var(--txt-3);margin-top:5px;line-height:1.5}
+.hint.err{color:var(--err)}
+/* SECTION: segmented */
+.seg{display:flex;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:4px}
+.seg button{
+  flex:1;padding:7px 10px;border-radius:6px;font-size:13px;font-weight:600;color:var(--txt-3);
+  transition:all .16s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.seg button svg{width:14px;height:14px}
+.seg button:hover{color:var(--txt-2)}
+.seg button.on{background:var(--acc-soft);color:var(--acc)}
+/* SECTION: tabs */
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:4px;margin-bottom:17px}
+.tabs button{flex:1;padding:8px;border-radius:6px;font-size:13.5px;font-weight:600;color:var(--txt-3);transition:all .16s}
+.tabs button.on{background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#06121f}
+/* SECTION: dropzone */
+.dz{
+  border:2px dashed var(--line);border-radius:var(--r-sm);padding:22px 16px;text-align:center;
+  transition:all .18s;cursor:pointer;background:rgba(21,31,56,.5);
+}
+.dz:hover,.dz.over{border-color:rgba(34,211,238,.55);background:var(--acc-soft)}
+.dz svg{width:26px;height:26px;color:var(--txt-3);margin:0 auto 8px}
+.dz.over svg{color:var(--acc)}
+.dz-t{font-size:13.5px;color:var(--txt-2);font-weight:500}
+.dz-t b{color:var(--acc)}
+.dz-s{font-size:11.8px;color:var(--txt-3);margin-top:3px}
+.fsel{
+  display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid rgba(52,211,153,.32);
+  border-radius:var(--r-sm);padding:11px 13px;
+}
+.fsel-ic{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:rgba(52,211,153,.14);flex:none}
+.fsel-ic svg{width:17px;height:17px;color:var(--ok)}
+.fsel-t{min-width:0;flex:1}
+.fsel-n{font-size:13.2px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fsel-s{font-size:11.5px;color:var(--txt-3)}
+.fsel-x{width:26px;height:26px;border-radius:6px;display:grid;place-items:center;color:var(--txt-3);transition:all .16s;flex:none}
+.fsel-x:hover{background:rgba(248,113,113,.14);color:var(--err)}
+.fsel-x svg{width:13px;height:13px}
+/* SECTION: progress */
+.prog{height:5px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:9px;position:relative}
+.prog-i{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc-2));border-radius:99px;width:0;transition:width .2s}
+.prog-ind .prog-i{width:38%;animation:ind 1.15s ease-in-out infinite}
+@keyframes ind{0%{margin-left:-38%}100%{margin-left:100%}}
+.spin{width:15px;height:15px;border:2px solid rgba(6,18,31,.3);border-top-color:#06121f;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* SECTION: detail */
+.dt-top{display:flex;gap:14px;align-items:flex-start;margin-bottom:15px}
+.dt-ico{width:60px;height:60px;border-radius:14px;font-size:25px;flex:none}
+.dt-name{font-size:19px;font-weight:750;line-height:1.35;word-break:break-word}
+.dt-sub{font-size:12.6px;color:var(--txt-3);margin-top:4px;display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.dt-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:9px;
+  background:var(--card);border:1px solid var(--line-soft);border-radius:11px;padding:13px;margin-bottom:15px;
+}
+.dt-cell span{display:block;font-size:11.3px;color:var(--txt-3);margin-bottom:2px}
+.dt-cell b{font-size:13.6px;font-weight:650;color:var(--txt);word-break:break-word}
+.dt-sec{margin-bottom:15px}
+.dt-sec h4{font-size:12.6px;color:var(--txt-3);font-weight:650;margin-bottom:7px;letter-spacing:.4px}
+.dt-desc{
+  font-size:13.8px;color:var(--txt-2);line-height:1.78;white-space:pre-wrap;word-break:break-word;
+  background:var(--card);border:1px solid var(--line-soft);border-radius:11px;padding:13px;
+  max-height:230px;overflow-y:auto;
+}
+.dt-warn{
+  display:flex;gap:9px;align-items:flex-start;font-size:12.2px;line-height:1.6;color:var(--warn);
+  background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);border-radius:10px;padding:10px 12px;
+}
+.dt-warn svg{width:15px;height:15px;margin-top:2px}
+/* SECTION: toast */
+.toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;width:calc(100% - 32px);max-width:400px;pointer-events:none}
+.toast{
+  display:flex;align-items:flex-start;gap:9px;padding:11px 14px;border-radius:11px;
+  background:var(--bg-soft);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5);
+  font-size:13.4px;line-height:1.5;pointer-events:auto;
+  animation:tin .26s cubic-bezier(.2,.8,.3,1);word-break:break-word;
+}
+.toast.out{animation:tout .22s forwards}
+@keyframes tin{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateY(-12px)}}
+.toast svg{width:16px;height:16px;margin-top:2px;flex:none}
+.toast.ok{border-color:rgba(52,211,153,.34)}.toast.ok svg{color:var(--ok)}
+.toast.err{border-color:rgba(248,113,113,.34)}.toast.err svg{color:var(--err)}
+.toast.warn{border-color:rgba(251,191,36,.34)}.toast.warn svg{color:var(--warn)}
+.toast.info svg{color:var(--acc)}
+/* SECTION: setup-screen */
+.setup{min-height:100vh;display:grid;place-items:center;padding:28px 18px}
+.setup-box{max-width:600px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 26px;box-shadow:var(--sh)}
+.setup-box h1{font-size:20px;font-weight:750;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.setup-box h1 svg{width:22px;height:22px;color:var(--warn);flex:none}
+.setup-box>p{font-size:14px;color:var(--txt-2);margin-bottom:18px}
+.setup-steps{display:flex;flex-direction:column;gap:11px;margin-bottom:18px}
+.setup-step{display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,.035);border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px}
+.setup-n{width:22px;height:22px;border-radius:50%;background:var(--acc-soft);color:var(--acc);font-size:12px;font-weight:750;display:grid;place-items:center;flex:none;margin-top:1px}
+.setup-step div{font-size:13.3px;color:var(--txt-2);line-height:1.62}
+.setup-step b{color:var(--txt)}
+code.k{background:rgba(34,211,238,.12);color:var(--acc);padding:1px 6px;border-radius:5px;font-size:12.4px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+/* SECTION: responsive */
+@media (max-width:860px){
+  .hdr-nav{display:none}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px}
+}
+@media (max-width:620px){
+  .wrap{padding:0 14px}
+  .hdr-in{height:58px;gap:9px}
+  .logo{font-size:16px}
+  .logo-badge{width:30px;height:30px;border-radius:8px}
+  .logo-badge svg{width:17px;height:17px}
+  .me-name{display:none}
+  .btn{padding:8px 13px;font-size:13.5px}
+  .hero{padding:26px 0 20px}
+  .hero p{font-size:14px}
+  .stats{gap:8px;margin-top:16px}
+  .stat{padding:7px 13px;min-width:88px}
+  .stat b{font-size:17px}
+  .sbar{padding:5px 5px 5px 13px;border-radius:11px}
+  .sbar input{font-size:14.5px}
+  .tbar{gap:9px;padding-bottom:13px;margin-bottom:16px}
+  .chips{order:2;width:100%;flex:none;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .tbar .sel{flex:1}
+  .grid{grid-template-columns:1fr;gap:11px}
+  .card{padding:15px;gap:10px}
+  .ico{width:42px;height:42px;border-radius:10px;font-size:17.5px}
+  .msk{padding:0;align-items:flex-end}
+  .mdl{max-width:none;border-radius:16px 16px 0 0;margin:auto 0 0;border-bottom:none;transform:translateY(20px)}
+  .mdl-bd{padding:16px 16px}
+  .mdl-hd{padding:16px 16px 13px}
+  .mdl-ft{padding:12px 16px 18px}
+  .row2{grid-template-columns:1fr}
+  .dt-ico{width:52px;height:52px;border-radius:12px;font-size:21px}
+  .dt-name{font-size:17px}
+  .setup-box{padding:22px 17px}
+  .ftr{margin-top:36px;padding:20px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<!-- SECTION: setup-screen -->
+<div class="setup" id="setupScreen" hidden>
+  <div class="setup-box">
+    <h1>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      网站还没连接数据库
+    </h1>
+    <p>代码已经写好了，只差最后一步：填入你自己的 Supabase 项目信息。跟着下面三步做，网站就能让所有人共享数据了。</p>
+    <div class="setup-steps">
+      <div class="setup-step"><div class="setup-n">1</div><div>用记事本打开本文件，找到顶部的 <code class="k">SECTION: config</code> 区块。</div></div>
+      <div class="setup-step"><div class="setup-n">2</div><div>把 <code class="k">在这里粘贴你的网址</code> 换成 Supabase 后台 <b>Settings → API</b> 里的 <b>Project URL</b>。</div></div>
+      <div class="setup-step"><div class="setup-n">3</div><div>把 <code class="k">在这里粘贴你的公钥</code> 换成同一页面的 <b>anon public</b> 密钥，保存后刷新即可。<br>详细图文步骤见随附的《部署指南》。</div></div>
+    </div>
+    <p style="font-size:12.4px;color:var(--txt-3);margin:0">提示：anon public 是可以公开放在网页里的前端密钥，权限已由数据库策略严格限制，不是需要保密的密码。请勿填入 service_role 密钥。</p>
+  </div>
+</div>
+
+<!-- SECTION: app -->
+<div id="app" hidden>
+
+  <!-- SECTION: header -->
+  <header class="hdr">
+    <div class="wrap hdr-in">
+      <a href="#" class="logo" id="logoHome" aria-label="返回首页">
+        <span class="logo-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </span>
+        <span>软件<em>大全</em></span>
+      </a>
+      <nav class="hdr-nav" aria-label="主导航">
+        <button class="nav-btn on" data-view="library" type="button">软件库</button>
+        <button class="nav-btn" data-view="mine" type="button">我的发布</button>
+      </nav>
+      <div class="hdr-sp"></div>
+      <div class="hdr-act">
+        <div class="me" id="meBox" hidden>
+          <span class="me-avatar" id="meAvatar">?</span>
+          <span class="me-name" id="meName"></span>
+        </div>
+        <button class="btn btn-p" id="btnPublish" data-primary-action type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>发布软件</span>
+        </button>
+        <button class="btn btn-g btn-sm" id="btnAuth" type="button">登录</button>
+        <button class="btn btn-o btn-sm" id="btnLogout" type="button" hidden>退出</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- SECTION: library-view -->
+    <section class="wrap" id="viewLibrary">
+      <div class="hero">
+        <h1>人人都能发布，<em>人人都能下载</em></h1>
+        <p>一个完全开放的软件分享平台。把你觉得好用的软件发上来，或者从这里找到别人分享的好工具。</p>
+        <div class="stats">
+          <div class="stat"><b id="stTotal">0</b><span>软件总数</span></div>
+          <div class="stat"><b id="stDown">0</b><span>累计下载</span></div>
+          <div class="stat"><b id="stUser">0</b><span>发布者</span></div>
+        </div>
+      </div>
+
+      <div class="sbar">
+        <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="searchInput" placeholder="搜索软件名称、简介或发布者…" autocomplete="off" aria-label="搜索软件">
+        <button class="btn btn-g btn-sm" id="btnClearSearch" type="button" hidden>清除</button>
+      </div>
+
+      <div class="tbar">
+        <div class="chips" id="catChips" role="group" aria-label="按分类筛选"></div>
+        <select class="sel" id="platSel" aria-label="按平台筛选">
+          <option value="">全部平台</option>
+        </select>
+        <select class="sel" id="sortSel" aria-label="排序方式">
+          <option value="new">最新发布</option>
+          <option value="hot">下载最多</option>
+          <option value="name">名称排序</option>
+        </select>
+      </div>
+
+      <div class="grid" id="grid"></div>
+      <div id="listState"></div>
+      <div class="more" id="moreBox" hidden>
+        <button class="btn btn-g" id="btnMore" type="button">加载更多</button>
+      </div>
+    </section>
+
+    <!-- SECTION: mine-view -->
+    <section class="wrap" id="viewMine" hidden style="padding-top:32px">
+      <div id="mineContent"></div>
+    </section>
+  </main>
+
+  <!-- SECTION: footer -->
+  <footer class="ftr">
+    <div class="wrap">
+      <div>软件大全 · 开放分享平台</div>
+      <div>本站仅提供用户自行发布的下载链接与文件，请务必自行核实软件来源与安全，下载后先杀毒再运行。</div>
+    </div>
+  </footer>
+</div>
+
+<!-- SECTION: modal-auth -->
+<div class="msk" id="mskAuth" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="mdl">
+    <div class="mdl-hd">
+      <div>
+        <h2 id="authTitle">登录</h2>
+        <p id="authSub">登录后即可发布和管理自己的软件</p>
+      </div>
+      <button class="mdl-x" data-close="mskAuth" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mdl-bd">
+      <div class="tabs">
+        <button type="button" id="tabLogin" class="on">登录</button>
+        <button type="button" id="tabSignup">注册</button>
+      </div>
+      <form id="authForm" novalidate>
+        <div class="fld" id="nickFld" hidden>
+          <label class="lbl" for="nickInput">昵称<span class="req">*</span></label>
+          <input class="inp" id="nickInput" type="text" maxlength="24" placeholder="别人会看到这个名字" autocomplete="nickname">
+          <div class="hint">2 到 24 个字符，会显示在你发布的软件上</div>
+        </div>
+        <div class="fld">
+          <label class="lbl" for="emailInput">邮箱<span class="req">*</span></label>
+          <input class="inp" id="emailInput" type="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="fld">
+          <label class="lbl" for="passInput">密码<span class="req">*</span></label>
+          <input class="inp" id="passInput" type="password" placeholder="至少 6 位" autocomplete="current-password" minlength="6" required>
+          <div class="hint" id="passHint">忘记密码请联系站点管理员在后台重置</div>
+        </div>
+      </form>
+    </div>
+    <div class="mdl-ft">
+      <button class="btn btn-o" data-close="mskAuth" type="button">取消</button>
+      <button class="btn btn-p" id="btnAuthSubmit" data-primary-action type="button">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: modal-publish -->
+<div class="msk" id="mskPublish" role="dialog" aria-modal="true" aria-labelledby="pubTitle">
+  <div class="mdl" style="max-width:580px">
+    <div class="mdl-hd">
+      <div>
+        <h2 id="pubTitle">发布软件</h2>
+        <p>填写软件信息，选择上传文件或粘贴下载链接</p>
+      </div>
+      <button class="mdl-x" data-close="mskPublish" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mdl-bd">
+      <form id="pubForm" novalidate>
+        <div class="fld">
+          <label class="lbl" for="pName">软件名称<span class="req">*</span></label>
+          <input class="inp" id="pName" type="text" maxlength="80" placeholder="例如：Visual Studio Code" required>
+        </div>
+        <div class="row2">
+          <div class="fld">
+            <label class="lbl" for="pCat">分类<span class="req">*</span></label>
+            <select class="inp sel" id="pCat" style="width:100%"></select>
+          </div>
+          <div class="fld">
+            <label class="lbl" for="pPlat">运行平台<span class="req">*</span></label>
+            <select class="inp sel" id="pPlat" style="width:100%"></select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="fld">
+            <label class="lbl" for="pVer">版本号<span class="opt">选填</span></label>
+            <input class="inp" id="pVer" type="text" maxlength="24" placeholder="例如：1.95.0">
+          </div>
+          <div class="fld">
+            <label class="lbl" for="pSize">文件大小<span class="opt">选填</span></label>
+            <input class="inp" id="pSize" type="text" maxlength="20" placeholder="例如：98 MB">
+          </div>
+        </div>
+        <div class="fld">
+          <label class="lbl" for="pDesc">软件简介<span class="req">*</span></label>
+          <textarea class="inp" id="pDesc" maxlength="2000" rows="4" placeholder="这个软件是做什么的？有什么特色？适合谁用？" required></textarea>
+          <div class="hint"><span id="descCount">0</span> / 2000</div>
+        </div>
+
+        <div class="fld">
+          <span class="lbl">获取方式<span class="req">*</span></span>
+          <div class="seg" id="dlModeSeg">
+            <button type="button" data-mode="link" class="on">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              粘贴下载链接
+            </button>
+            <button type="button" data-mode="file">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              直接上传文件
+            </button>
+          </div>
+        </div>
+
+        <div class="fld" id="linkFld">
+          <label class="lbl" for="pLink">下载链接<span class="req">*</span></label>
+          <input class="inp" id="pLink" type="url" placeholder="https://…（网盘分享链接或官方直链）">
+          <div class="hint">推荐用网盘链接，不占用本站流量额度，且没有大小限制</div>
+        </div>
+
+        <div class="fld" id="fileFld" hidden>
+          <span class="lbl">安装文件<span class="req">*</span></span>
+          <div id="dzWrap">
+            <div class="dz" id="dropzone" role="button" tabindex="0" aria-label="选择或拖入要上传的文件">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <div class="dz-t">点击选择文件，或把文件<b>拖到这里</b></div>
+              <div class="dz-s">单个文件不超过 <b id="maxSizeLabel">50 MB</b>（免费版存储上限）</div>
+            </div>
+            <input type="file" id="fileInput" hidden>
+          </div>
+          <div id="filePicked" hidden>
+            <div class="fsel">
+              <span class="fsel-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </span>
+              <span class="fsel-t">
+                <span class="fsel-n" id="pickedName"></span>
+                <span class="fsel-s" id="pickedSize"></span>
+              </span>
+              <button class="fsel-x" id="btnClearFile" type="button" aria-label="移除已选文件">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="prog" id="upProg" hidden><div class="prog-i" id="upProgI"></div></div>
+          </div>
+          <div class="hint">大文件（超过 50 MB）请改用上面的「粘贴下载链接」方式</div>
+        </div>
+      </form>
+    </div>
+    <div class="mdl-ft">
+      <button class="btn btn-o" data-close="mskPublish" type="button">取消</button>
+      <button class="btn btn-p" id="btnPubSubmit" data-primary-action type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        发布
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: modal-detail -->
+<div class="msk" id="mskDetail" role="dialog" aria-modal="true" aria-labelledby="dtTitle">
+  <div class="mdl" style="max-width:580px">
+    <div class="mdl-hd">
+      <div style="min-width:0">
+        <h2 id="dtTitle">软件详情</h2>
+        <p>确认信息后点击下载</p>
+      </div>
+      <button class="mdl-x" data-close="mskDetail" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mdl-bd" id="detailBody"></div>
+    <div class="mdl-ft" id="detailFoot"></div>
+  </div>
+</div>
+
+<!-- SECTION: modal-confirm -->
+<div class="msk" id="mskConfirm" role="dialog" aria-modal="true" aria-labelledby="cfTitle">
+  <div class="mdl" style="max-width:400px">
+    <div class="mdl-hd">
+      <div><h2 id="cfTitle">确认操作</h2></div>
+      <button class="mdl-x" data-close="mskConfirm" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mdl-bd"><p id="cfText" style="font-size:14px;color:var(--txt-2);line-height:1.7"></p></div>
+    <div class="mdl-ft">
+      <button class="btn btn-o" data-close="mskConfirm" type="button">取消</button>
+      <button class="btn btn-d" id="btnConfirmOk" type="button">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: toasts -->
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   软件大全 · 前端逻辑
+   数据与文件全部存放在 Supabase 云端，所有访客共享同一份数据。
+   本文件不含任何密钥以外的敏感信息；SUPABASE_ANON_KEY 是可公开的前端密钥。
+   ============================================================ */
+
+/* SECTION: config —— 部署时只需修改下面两行 */
+window.APP_CONFIG = {
+  SUPABASE_URL: 'https://hjlgailxkktdwrfjmftl.supabase.co',
+  SUPABASE_ANON_KEY: 'sb_publishable_Yh8QS0wFUW4jGurdyz_HZw_xNvXXvmN',
+  STORAGE_BUCKET: 'software-files',
+  MAX_UPLOAD_MB: 50
+};
+
+(function () {
+  'use strict';
+
+  /* SECTION: constants */
+  var CFG = window.APP_CONFIG || {};
+  var PAGE_SIZE = 12;
+  var CATS = ['开发工具', '办公软件', '设计创意', '媒体影音', '系统工具', '网络安全', '学习教育', '游戏娱乐', '其他'];
+  var PLATS = ['Windows', 'macOS', 'Linux', 'Android', 'iOS', '跨平台', '网页版'];
+  var GRADS = [
+    'linear-gradient(135deg,#22d3ee,#3b82f6)',
+    'linear-gradient(135deg,#a78bfa,#6366f1)',
+    'linear-gradient(135deg,#34d399,#059669)',
+    'linear-gradient(135deg,#fbbf24,#f59e0b)',
+    'linear-gradient(135deg,#f472b6,#db2777)',
+    'linear-gradient(135deg,#60a5fa,#2563eb)',
+    'linear-gradient(135deg,#f87171,#dc2626)',
+    'linear-gradient(135deg,#2dd4bf,#0d9488)'
+  ];
+
+  /* SECTION: state */
+  var S = {
+    ready: false,
+    user: null,
+    nickname: '',
+    items: [],
+    view: 'library',
+    q: '',
+    cat: '',
+    plat: '',
+    sort: 'new',
+    shown: PAGE_SIZE,
+    loading: false,
+    busy: false,
+    authMode: 'login',
+    dlMode: 'link',
+    picked: null,
+    detail: null
+  };
+
+  var sb = null;
+
+  /* SECTION: dom-helpers */
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  var PATHS = {
+    download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+    trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>',
+    box: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+    check: '<polyline points="20 6 9 17 4 12"/>',
+    alert: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+    info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+    warn: '<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    x: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+    user: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+    gauge: '<path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 12l5-5"/><circle cx="12" cy="12" r="1"/>',
+    tag: '<path d="M20.59 13.41 12 22l-9-9V3h10z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
+    plus: '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'
+  };
+
+  function icon(name) {
+    var s = document.createElementNS(SVG_NS, 'svg');
+    s.setAttribute('viewBox', '0 0 24 24');
+    s.setAttribute('fill', 'none');
+    s.setAttribute('stroke', 'currentColor');
+    s.setAttribute('stroke-width', '2');
+    s.setAttribute('stroke-linecap', 'round');
+    s.setAttribute('stroke-linejoin', 'round');
+    s.setAttribute('aria-hidden', 'true');
+    s.innerHTML = PATHS[name] || PATHS.info;
+    return s;
+  }
+
+  function el(tag, props, kids) {
+    var n = document.createElement(tag);
+    if (props) {
+      for (var k in props) {
+        if (!Object.prototype.hasOwnProperty.call(props, k)) continue;
+        var v = props[k];
+        if (v === null || v === undefined || v === false) continue;
+        if (k === 'class') n.className = v;
+        else if (k === 'text') n.textContent = v;
+        else if (k === 'hidden') n.hidden = !!v;
+        else if (k.slice(0, 2) === 'on' && typeof v === 'function') n.addEventListener(k.slice(2), v);
+        else n.setAttribute(k, v);
+      }
+    }
+    if (kids) {
+      var arr = Array.isArray(kids) ? kids : [kids];
+      for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === null || arr[i] === undefined || arr[i] === false) continue;
+        n.appendChild(typeof arr[i] === 'string' ? document.createTextNode(arr[i]) : arr[i]);
+      }
+    }
+    return n;
+  }
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s === null || s === undefined ? '' : s); }
+
+  /* SECTION: utils */
+  function fmtSize(bytes) {
+    var n = Number(bytes);
+    if (!n || n <= 0) return '—';
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+    if (n < 1073741824) return (n / 1048576).toFixed(1) + ' MB';
+    return (n / 1073741824).toFixed(2) + ' GB';
+  }
+
+  function fmtNum(n) {
+    n = Number(n) || 0;
+    if (n < 1000) return String(n);
+    if (n < 10000) return (n / 1000).toFixed(1) + 'k';
+    return Math.round(n / 1000) + 'k';
+  }
+
+  function fmtDate(iso) {
+    if (!iso) return '—';
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '—';
+    var diff = Date.now() - d.getTime();
+    if (diff < 60000) return '刚刚';
+    if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
+    if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
+    if (diff < 2592000000) return Math.floor(diff / 86400000) + ' 天前';
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return d.getFullYear() + '-' + m + '-' + day;
+  }
+
+  function gradFor(name) {
+    var str = String(name || ''), h = 0;
+    for (var i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
+    return GRADS[h % GRADS.length];
+  }
+
+  function initial(name) {
+    var str = String(name || '?').trim();
+    if (!str) return '?';
+    var ch = Array.from(str)[0];
+    return /[a-zA-Z]/.test(ch) ? ch.toUpperCase() : ch;
+  }
+
+  function isSafeUrl(u) {
+    var s = String(u || '').trim();
+    return /^https?:\/\//i.test(s);
+  }
+
+  /* SECTION: toast */
+  function toast(msg, kind) {
+    kind = kind || 'info';
+    var box = $('toasts');
+    var t = el('div', { class: 'toast ' + kind, role: 'status' }, [icon(kind === 'ok' ? 'check' : kind === 'err' ? 'alert' : kind === 'warn' ? 'warn' : 'info'), el('div', { text: esc(msg) })]);
+    box.appendChild(t);
+    setTimeout(function () {
+      t.classList.add('out');
+      setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); }, 240);
+    }, kind === 'err' ? 5200 : 3000);
+  }
+
+  /* SECTION: modal */
+  var openMask = null;
+  function showModal(id) {
+    if (openMask && openMask !== id) hideModal(openMask);
+    var m = $(id);
+    m.classList.add('on');
+    openMask = id;
+    document.body.style.overflow = 'hidden';
+    var f = m.querySelector('input:not([type=hidden]),select,textarea,button.btn-p');
+    if (f) setTimeout(function () { try { f.focus(); } catch (e) {} }, 120);
+  }
+  function hideModal(id) {
+    var m = $(id || openMask);
+    if (!m) return;
+    m.classList.remove('on');
+    if (openMask === (id || openMask)) openMask = null;
+    if (!$('.msk.on')) document.body.style.overflow = '';
+  }
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest ? e.target.closest('[data-close]') : null;
+    if (c) { e.preventDefault(); hideModal(c.getAttribute('data-close')); return; }
+    if (e.target.classList && e.target.classList.contains('msk') && e.target.classList.contains('on')) hideModal(e.target.id);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && openMask) hideModal(openMask);
+  });
+
+  var confirmCb = null;
+  function askConfirm(title, text, onOk) {
+    $('cfTitle').textContent = title;
+    $('cfText').textContent = text;
+    confirmCb = onOk;
+    showModal('mskConfirm');
+  }
+  $('btnConfirmOk').addEventListener('click', function () {
+    var cb = confirmCb;
+    confirmCb = null;
+    hideModal('mskConfirm');
+    if (cb) cb();
+  });
+
+  /* SECTION: config-check */
+  function isConfigured() {
+    var u = String(CFG.SUPABASE_URL || ''), k = String(CFG.SUPABASE_ANON_KEY || '');
+    if (u.indexOf('在这里粘贴') !== -1 || k.indexOf('在这里粘贴') !== -1) return false;
+    if (!/^https:\/\/[a-z0-9\-]+\.supabase\.(co|in|net|io)/i.test(u)) return false;
+    return k.length > 30;
+  }
+
+  /* SECTION: data-access */
+  function flatten(rows) {
+    return (rows || []).map(function (r) {
+      var p = r.profiles;
+      if (Array.isArray(p)) p = p[0];
+      var nick = (p && p.nickname) || '匿名发布者';
+      return {
+        id: r.id,
+        name: r.name,
+        description: r.description || '',
+        category: r.category || '其他',
+        platform: r.platform || 'Windows',
+        version: r.version || '',
+        size_text: r.size_text || '',
+        size_bytes: r.size_bytes || 0,
+        download_type: r.download_type || 'link',
+        download_url: r.download_url || '',
+        storage_path: r.storage_path || '',
+        file_name: r.file_name || '',
+        downloads: r.downloads || 0,
+        created_at: r.created_at,
+        user_id: r.user_id,
+        publisher: nick
+      };
+    });
+  }
+
+  function loadItems() {
+    S.loading = true;
+    renderList();
+    return sb.from('software')
+      .select('*, profiles(nickname)')
+      .order('created_at', { ascending: false })
+      .limit(500)
+      .then(function (res) {
+        if (res.error) throw res.error;
+        S.items = flatten(res.data);
+        S.loading = false;
+        renderStats();
+        renderPlatOptions();
+        renderList();
+      })
+      .catch(function (err) {
+        S.loading = false;
+        renderList();
+        toast('读取软件列表失败：' + errHint(err), 'err');
+      });
+  }
+
+  function errHint(err) {
+    var m = String((err && err.message) || err || '未知错误');
+    if (/relation .* does not exist/i.test(m)) return '数据表还没建好，请先执行《部署指南》里的建库 SQL';
+    if (/row-level security/i.test(m) || /permission denied/i.test(m)) return '数据库权限策略未生效，请检查 SQL 是否完整执行';
+    if (/Invalid login credentials/i.test(m)) return '邮箱或密码不正确';
+    if (/already registered/i.test(m)) return '这个邮箱已经注册过了，请直接登录';
+    if (/Failed to fetch|NetworkError|CORS/i.test(m)) return '网络连不上 Supabase，请检查网址是否填对，或在后台把本站域名加入白名单';
+    if (/exceeds|too large|maximum/i.test(m)) return '文件太大，超出免费版存储限制，请改用下载链接方式';
+    if (/Bucket not found/i.test(m)) return '存储桶还没创建，请按《部署指南》建立 software-files 桶';
+    return m;
+  }
+
+  function loadMe() {
+    return sb.auth.getSession().then(function (res) {
+      var sess = res.data && res.data.session;
+      if (!sess || !sess.user) { S.user = null; S.nickname = ''; return; }
+      S.user = sess.user;
+      return sb.from('profiles').select('nickname').eq('id', sess.user.id).maybeSingle().then(function (r) {
+        S.nickname = (r.data && r.data.nickname) || (sess.user.user_metadata && sess.user.user_metadata.nickname) || '匿名发布者';
+      });
+    }).catch(function () { S.user = null; });
+  }
+
+  /* SECTION: render-header */
+  function renderAuth() {
+    var logged = !!S.user;
+    $('meBox').hidden = !logged;
+    $('btnLogout').hidden = !logged;
+    $('btnAuth').hidden = logged;
+    if (logged) {
+      $('meAvatar').textContent = initial(S.nickname);
+      $('meName').textContent = S.nickname;
+      $('btnAuth').textContent = '登录';
+    }
+    $('btnPublish').querySelector('span').textContent = logged ? '发布软件' : '登录后可发布';
+  }
+
+  function renderStats() {
+    var total = S.items.length;
+    var down = 0, seen = {}, users = 0;
+    for (var i = 0; i < S.items.length; i++) {
+      down += Number(S.items[i].downloads) || 0;
+      if (S.items[i].user_id && !seen[S.items[i].user_id]) { seen[S.items[i].user_id] = 1; users++; }
+    }
+    $('stTotal').textContent = fmtNum(total);
+    $('stDown').textContent = fmtNum(down);
+    $('stUser').textContent = fmtNum(users);
+  }
+
+  function renderChips() {
+    var box = $('catChips');
+    box.textContent = '';
+    var all = el('button', { class: 'chip' + (S.cat === '' ? ' on' : ''), type: 'button', onclick: function () { S.cat = ''; S.shown = PAGE_SIZE; renderChips(); renderList(); } }, '全部');
+    box.appendChild(all);
+    CATS.forEach(function (c) {
+      var n = 0;
+      for (var i = 0; i < S.items.length; i++) if (S.items[i].category === c) n++;
+      var b = el('button', {
+        class: 'chip' + (S.cat === c ? ' on' : ''),
+        type: 'button',
+        onclick: function () { S.cat = c; S.shown = PAGE_SIZE; renderChips(); renderList(); }
+      });
+      b.appendChild(document.createTextNode(c));
+      if (n > 0) {
+        b.appendChild(el('span', { text: ' ' + n, style: 'opacity:.6;font-size:11.5px' }));
+      }
+      box.appendChild(b);
+    });
+  }
+
+  function renderPlatOptions() {
+    var sel = $('platSel');
+    var cur = S.plat;
+    sel.textContent = '';
+    sel.appendChild(el('option', { value: '' }, '全部平台'));
+    PLATS.forEach(function (p) {
+      var used = false;
+      for (var i = 0; i < S.items.length; i++) if (S.items[i].platform === p) used = true;
+      if (used || p === cur) sel.appendChild(el('option', { value: p }, p));
+    });
+    sel.value = cur;
+  }
+
+  /* SECTION: filter-sort */
+  function filtered() {
+    var q = S.q.trim().toLowerCase();
+    var out = S.items.filter(function (it) {
+      if (S.cat && it.category !== S.cat) return false;
+      if (S.plat && it.platform !== S.plat) return false;
+      if (!q) return true;
+      return (it.name || '').toLowerCase().indexOf(q) !== -1 ||
+        (it.description || '').toLowerCase().indexOf(q) !== -1 ||
+        (it.publisher || '').toLowerCase().indexOf(q) !== -1 ||
+        (it.category || '').toLowerCase().indexOf(q) !== -1;
+    });
+    if (S.sort === 'hot') out.sort(function (a, b) { return (b.downloads || 0) - (a.downloads || 0); });
+    else if (S.sort === 'name') out.sort(function (a, b) { return String(a.name).localeCompare(String(b.name), 'zh-Hans-CN'); });
+    else out.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+    return out;
+  }
+
+  /* SECTION: render-card */
+  function makeCard(it) {
+    var mine = S.user && it.user_id === S.user.id;
+
+    var ico = el('div', { class: 'ico', 'aria-hidden': 'true', style: 'background:' + gradFor(it.name), text: initial(it.name) });
+
+    var tt = el('div', { class: 'card-tt' }, [
+      el('div', { class: 'card-name', text: esc(it.name), title: esc(it.name) }),
+      el('div', { class: 'card-ver', text: it.version ? 'v' + esc(it.version) : '未标注版本' })
+    ]);
+
+    var tags = el('div', { class: 'tags' }, [
+      el('span', { class: 'tag cat', text: esc(it.category) }),
+      el('span', { class: 'tag', text: esc(it.platform) }),
+      it.size_text ? el('span', { class: 'tag', text: esc(it.size_text) }) : null
+    ]);
+
+    var mDown = el('span', { class: 'meta', title: '下载次数' }, [icon('download'), document.createTextNode(' ' + fmtNum(it.downloads))]);
+    var mWho = el('span', { class: 'meta', title: '发布者：' + esc(it.publisher) }, [icon('user'), el('span', { class: 'who', text: esc(it.publisher) })]);
+    var mTime = el('span', { class: 'meta', title: '发布时间' }, [icon('clock'), document.createTextNode(' ' + fmtDate(it.created_at))]);
+
+    var dlBtn = el('button', {
+      class: 'btn btn-p btn-sm',
+      type: 'button',
+      'data-primary-action': '',
+      onclick: function (e) { e.stopPropagation(); doDownload(it, dlBtn); }
+    }, [icon('download'), document.createTextNode('下载')]);
+
+    var ft = el('div', { class: 'card-ft' }, [mDown, mWho, mTime, dlBtn]);
+
+    var card = el('article', {
+      class: 'card',
+      tabindex: '0',
+      role: 'button',
+      'aria-label': '查看 ' + esc(it.name) + ' 的详情',
+      onclick: function () { openDetail(it); },
+      onkeydown: function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDetail(it); } }
+    }, [
+      el('div', { class: 'card-top' }, [ico, tt]),
+      el('p', { class: 'card-desc', text: esc(it.description) || '发布者没有填写简介' }),
+      tags,
+      ft
+    ]);
+
+    if (mine) {
+      var del = el('button', {
+        class: 'btn btn-d btn-sm',
+        type: 'button',
+        title: '删除这条发布',
+        onclick: function (e) { e.stopPropagation(); askDelete(it); }
+      }, [icon('trash'), document.createTextNode('删除')]);
+      // 删除键排在下载键之前，由它承担靠右推挤；下载键不再重复设置外边距
+      del.style.marginLeft = 'auto';
+      dlBtn.style.marginLeft = '0';
+      ft.insertBefore(del, dlBtn);
+    }
+    return card;
+  }
+
+  function makeSkeleton() {
+    return el('div', { class: 'sk', 'aria-hidden': 'true' }, [
+      el('div', { style: 'display:flex;gap:12px' }, [el('div', { class: 'sk-l sk-ico' }), el('div', { style: 'flex:1' }, [el('div', { class: 'sk-l sk-t' }), el('div', { class: 'sk-l sk-s' })])]),
+      el('div', { class: 'sk-l', style: 'height:12px;margin-top:13px' }),
+      el('div', { class: 'sk-l', style: 'height:12px;width:76%;margin-top:7px' }),
+      el('div', { class: 'sk-l sk-b' })
+    ]);
+  }
+
+  function makeEmpty(title, text, actionLabel, actionFn) {
+    var box = el('div', { class: 'empty' }, [
+      el('div', { class: 'empty-ic' }, [icon('box')]),
+      el('h3', { text: esc(title) }),
+      el('p', { text: esc(text) })
+    ]);
+    if (actionLabel && actionFn) box.appendChild(el('button', { class: 'btn btn-p', type: 'button', onclick: actionFn }, [icon('plus'), document.createTextNode(actionLabel)]));
+    return box;
+  }
+
+  /* SECTION: render-list */
+  function renderList() {
+    var grid = $('grid');
+    var st = $('listState');
+    var more = $('moreBox');
+    grid.textContent = '';
+    st.textContent = '';
+
+    if (S.loading) {
+      for (var i = 0; i < 6; i++) grid.appendChild(makeSkeleton());
+      more.hidden = true;
+      return;
+    }
+
+    var list = filtered();
+    if (list.length === 0) {
+      var hasFilter = S.q || S.cat || S.plat;
+      if (S.items.length === 0) {
+        st.appendChild(makeEmpty(
+          '还没有人发布软件',
+          '你来当第一个吧！把你觉得好用的软件分享出来，所有人都能免费下载。',
+          '立即发布第一个软件',
+          function () { tryPublish(); }
+        ));
+      } else if (hasFilter) {
+        st.appendChild(makeEmpty(
+          '没有找到匹配的软件',
+          '换个关键词，或者清空筛选条件再试试。',
+          '清空全部筛选',
+          function () { S.q = ''; S.cat = ''; S.plat = ''; $('searchInput').value = ''; $('platSel').value = ''; $('btnClearSearch').hidden = true; renderChips(); renderList(); }
+        ));
+      } else {
+        st.appendChild(makeEmpty('这里还是空的', '发布一个软件，让它出现在这里。', '发布软件', function () { tryPublish(); }));
+      }
+      more.hidden = true;
+      return;
+    }
+
+    var slice = list.slice(0, S.shown);
+    slice.forEach(function (it) { grid.appendChild(makeCard(it)); });
+    more.hidden = slice.length >= list.length;
+    $('btnMore').textContent = '加载更多（还有 ' + (list.length - slice.length) + ' 个）';
+  }
+
+  /* SECTION: render-mine */
+  function renderMine() {
+    var box = $('mineContent');
+    box.textContent = '';
+
+    if (!S.user) {
+      box.appendChild(makeEmpty('登录后查看你的发布', '登录之后，你发布过的软件都会集中显示在这里，可以随时删除或查看下载情况。', '登录 / 注册', function () { openAuth('login'); }));
+      return;
+    }
+
+    var mine = S.items.filter(function (it) { return it.user_id === S.user.id; });
+
+    box.appendChild(el('div', { style: 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px' }, [
+      el('h2', { style: 'font-size:20px;font-weight:750', text: '我的发布' }),
+      el('span', { class: 'tag cat', text: mine.length + ' 个软件' }),
+      el('span', { style: 'flex:1' }),
+      el('button', { class: 'btn btn-p btn-sm', type: 'button', onclick: function () { tryPublish(); } }, [icon('plus'), document.createTextNode('发布新软件')])
+    ]));
+
+    if (mine.length === 0) {
+      box.appendChild(makeEmpty('你还没有发布过软件', '把你觉得好用的软件分享出来，帮助别人少踩坑。', '发布第一个软件', function () { tryPublish(); }));
+      return;
+    }
+
+    var g = el('div', { class: 'grid' });
+    mine.forEach(function (it) { g.appendChild(makeCard(it)); });
+    box.appendChild(g);
+  }
+
+  function renderView() {
+    var lib = S.view === 'library';
+    $('viewLibrary').hidden = !lib;
+    $('viewMine').hidden = lib;
+    var btns = document.querySelectorAll('.nav-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('on', btns[i].getAttribute('data-view') === S.view);
+    }
+    if (!lib) renderMine();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* SECTION: detail */
+  function openDetail(it) {
+    S.detail = it;
+    var body = $('detailBody');
+    var foot = $('detailFoot');
+    body.textContent = '';
+    foot.textContent = '';
+
+    var dtIco = el('div', { class: 'ico dt-ico', 'aria-hidden': 'true', style: 'background:' + gradFor(it.name), text: initial(it.name) });
+    var dtTt = el('div', { style: 'min-width:0;flex:1' }, [
+      el('div', { class: 'dt-name', id: 'dtName', text: esc(it.name) }),
+      el('div', { class: 'dt-sub' }, [
+        el('span', { class: 'tag cat', text: esc(it.category) }),
+        el('span', { text: esc(it.platform) }),
+        it.version ? el('span', { text: 'v' + esc(it.version) }) : null
+      ])
+    ]);
+    body.appendChild(el('div', { class: 'dt-top' }, [dtIco, dtTt]));
+
+    var cells = [
+      ['发布者', esc(it.publisher)],
+      ['发布时间', fmtDate(it.created_at)],
+      ['文件大小', it.size_text || fmtSize(it.size_bytes)],
+      ['下载次数', fmtNum(it.downloads)],
+      ['获取方式', it.download_type === 'file' ? '站内文件' : '外部链接']
+    ];
+    var g = el('div', { class: 'dt-grid' });
+    cells.forEach(function (c) {
+      g.appendChild(el('div', { class: 'dt-cell' }, [el('span', { text: c[0] }), el('b', { text: c[1] })]));
+    });
+    body.appendChild(g);
+
+    body.appendChild(el('div', { class: 'dt-sec' }, [
+      el('h4', { text: '软件简介' }),
+      el('div', { class: 'dt-desc', text: esc(it.description) || '发布者没有填写简介。' })
+    ]));
+
+    if (it.download_type === 'link' && it.download_url) {
+      var host = '';
+      try { host = new URL(it.download_url).hostname; } catch (e) { host = '外部站点'; }
+      body.appendChild(el('div', { class: 'dt-sec' }, [
+        el('h4', { text: '下载来源' }),
+        el('div', { class: 'dt-cell', style: 'background:var(--card);border:1px solid var(--line-soft);border-radius:11px;padding:11px 13px' }, [
+          el('b', { text: host, style: 'word-break:break-all' })
+        ])
+      ]));
+    }
+    if (it.download_type === 'file' && it.file_name) {
+      body.appendChild(el('div', { class: 'dt-sec' }, [
+        el('h4', { text: '文件名' }),
+        el('div', { class: 'dt-cell', style: 'background:var(--card);border:1px solid var(--line-soft);border-radius:11px;padding:11px 13px' }, [
+          el('b', { text: esc(it.file_name), style: 'word-break:break-all' })
+        ])
+      ]));
+    }
+
+    body.appendChild(el('div', { class: 'dt-warn' }, [
+      icon('warn'),
+      el('div', {}, '本软件由用户「' + esc(it.publisher) + '」自行发布，本站不做安全审核。下载后请先用杀毒软件扫描，确认安全后再安装运行。')
+    ]));
+
+    var closeB = el('button', { class: 'btn btn-o', type: 'button', onclick: function () { hideModal('mskDetail'); } }, '关闭');
+    var dlB = el('button', { class: 'btn btn-p', type: 'button', 'data-primary-action': '', onclick: function () { doDownload(it, dlB); } }, [icon('download'), document.createTextNode('立即下载')]);
+    foot.appendChild(closeB);
+    foot.appendChild(dlB);
+
+    if (S.user && it.user_id === S.user.id) {
+      foot.insertBefore(el('button', {
+        class: 'btn btn-d', type: 'button',
+        onclick: function () { askDelete(it, function () { hideModal('mskDetail'); }); }
+      }, [icon('trash'), document.createTextNode('删除')]), closeB);
+    }
+
+    showModal('mskDetail');
+  }
+
+  /* SECTION: download */
+  function setBtnBusy(btn, busy, label) {
+    if (!btn) return;
+    if (busy) {
+      btn.dataset.old = btn.innerHTML;
+      btn.disabled = true;
+      btn.textContent = '';
+      btn.appendChild(el('span', { class: 'spin' }));
+      btn.appendChild(document.createTextNode(label || '处理中…'));
+    } else {
+      btn.disabled = false;
+      if (btn.dataset.old) btn.innerHTML = btn.dataset.old;
+    }
+  }
+
+  function doDownload(it, btn) {
+    if (it.download_type === 'link') {
+      if (!isSafeUrl(it.download_url)) { toast('这条发布的下载链接无效，请联系发布者修正', 'err'); return; }
+      window.open(it.download_url, '_blank', 'noopener,noreferrer');
+      bumpDownload(it);
+      toast('已在新标签页打开下载链接', 'ok');
+      return;
+    }
+
+    if (!it.storage_path) { toast('这条发布没有可用的文件，请联系发布者', 'err'); return; }
+
+    setBtnBusy(btn, true, '准备文件…');
+    // getPublicUrl 在 supabase-js v2 中是同步方法，直接返回 { data: { publicUrl } }
+    var res;
+    try {
+      res = sb.storage.from(CFG.STORAGE_BUCKET).getPublicUrl(it.storage_path);
+    } catch (e) {
+      setBtnBusy(btn, false);
+      toast('获取文件地址失败，请稍后再试', 'err');
+      return;
+    }
+    setBtnBusy(btn, false);
+    var url = res && res.data && res.data.publicUrl;
+    if (!url) { toast('获取文件地址失败，请稍后再试', 'err'); return; }
+
+    var a = el('a', { href: url, target: '_blank', rel: 'noopener noreferrer', download: esc(it.file_name || '') });
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 600);
+    bumpDownload(it);
+    toast('文件已开始下载，请留意浏览器下载栏', 'ok');
+  }
+
+  function bumpDownload(it) {
+    it.downloads = (Number(it.downloads) || 0) + 1;
+    renderStats();
+    if (S.view === 'library') renderList(); else renderMine();
+    sb.rpc('increment_download', { p_id: it.id }).then(function (res) {
+      if (res.error) console.warn('下载次数回写失败：', res.error.message);
+    }).catch(function () { /* 计数失败不影响下载体验 */ });
+  }
+
+  /* SECTION: delete */
+  function askDelete(it, after) {
+    askConfirm('删除这条发布', '确定要删除「' + it.name + '」吗？删除后所有人都不再看到它，' + (it.download_type === 'file' ? '已上传的文件也会一并移除，' : '') + '这个操作无法撤销。', function () {
+      doDelete(it, after);
+    });
+  }
+
+  function doDelete(it, after) {
+    // 先删数据库记录（SQL 里已建触发器，会自动连带清理存储文件）
+    sb.from('software').delete().eq('id', it.id).then(function (res) {
+      if (res.error) throw res.error;
+      S.items = S.items.filter(function (x) { return x.id !== it.id; });
+      renderStats();
+      renderList();
+      if (S.view === 'mine') renderMine();
+      toast('已删除「' + it.name + '」', 'ok');
+      if (after) after();
+      // 再尽力清理一次存储文件；失败不影响结果，触发器已兜底
+      if (it.download_type === 'file' && it.storage_path) {
+        sb.storage.from(CFG.STORAGE_BUCKET).remove([it.storage_path]).catch(function () {});
+      }
+    }).catch(function (err) {
+      toast('删除失败：' + errHint(err), 'err');
+    });
+  }
+
+  /* SECTION: auth */
+  function openAuth(mode) {
+    S.authMode = mode || 'login';
+    applyAuthMode();
+    showModal('mskAuth');
+  }
+
+  function applyAuthMode() {
+    var isSignup = S.authMode === 'signup';
+    $('authTitle').textContent = isSignup ? '注册账号' : '登录';
+    $('authSub').textContent = isSignup ? '注册只需邮箱和密码，马上就能发布软件' : '登录后即可发布和管理自己的软件';
+    $('tabLogin').classList.toggle('on', !isSignup);
+    $('tabSignup').classList.toggle('on', isSignup);
+    $('nickFld').hidden = !isSignup;
+    $('nickInput').required = isSignup;
+    $('passInput').setAttribute('autocomplete', isSignup ? 'new-password' : 'current-password');
+    $('passHint').textContent = isSignup ? '至少 6 位，请牢记；本站没有找回密码邮件功能' : '忘记密码请联系站点管理员在后台重置';
+    $('btnAuthSubmit').textContent = isSignup ? '注册并登录' : '登录';
+  }
+
+  function submitAuth() {
+    if (S.busy) return;
+    var email = $('emailInput').value.trim();
+    var pass = $('passInput').value;
+    var nick = $('nickInput').value.trim();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('请填写一个有效的邮箱地址', 'warn'); $('emailInput').focus(); return; }
+    if (pass.length < 6) { toast('密码至少需要 6 位', 'warn'); $('passInput').focus(); return; }
+    if (S.authMode === 'signup') {
+      if (nick.length < 2 || nick.length > 24) { toast('昵称需要 2 到 24 个字符', 'warn'); $('nickInput').focus(); return; }
+    }
+
+    S.busy = true;
+    var btn = $('btnAuthSubmit');
+    setBtnBusy(btn, true, S.authMode === 'signup' ? '注册中…' : '登录中…');
+
+    var p;
+    if (S.authMode === 'signup') {
+      p = sb.auth.signUp({ email: email, password: pass, options: { data: { nickname: nick } } }).then(function (res) {
+        if (res.error) throw res.error;
+        if (!res.data.session) {
+          throw new Error('注册成功，但站点开启了邮箱验证。请去邮箱点击确认链接后再登录；或在 Supabase 后台关闭邮箱验证（Authentication → Sign In / Up → Confirm email）');
+        }
+        return res.data.session;
+      });
+    } else {
+      p = sb.auth.signInWithPassword({ email: email, password: pass }).then(function (res) {
+        if (res.error) throw res.error;
+        return res.data.session;
+      });
+    }
+
+    p.then(function () {
+      return loadMe();
+    }).then(function () {
+      setBtnBusy(btn, false);
+      S.busy = false;
+      hideModal('mskAuth');
+      $('authForm').reset();
+      renderAuth();
+      renderList();
+      if (S.view === 'mine') renderMine();
+      toast(S.authMode === 'signup' ? '注册成功，欢迎加入！' : '登录成功，欢迎回来 ' + S.nickname, 'ok');
+    }).catch(function (err) {
+      setBtnBusy(btn, false);
+      S.busy = false;
+      toast(errHint(err), 'err');
+    });
+  }
+
+  function doLogout() {
+    sb.auth.signOut().then(function () {
+      S.user = null;
+      S.nickname = '';
+      renderAuth();
+      renderList();
+      if (S.view === 'mine') { S.view = 'library'; renderView(); }
+      toast('已退出登录', 'ok');
+    }).catch(function () { toast('退出失败，请刷新页面重试', 'err'); });
+  }
+
+  /* SECTION: publish */
+  function tryPublish() {
+    if (!S.user) {
+      toast('登录后才能发布软件', 'warn');
+      openAuth('signup');
+      return;
+    }
+    resetPubForm();
+    showModal('mskPublish');
+  }
+
+  function resetPubForm() {
+    $('pubForm').reset();
+    $('descCount').textContent = '0';
+    S.picked = null;
+    S.dlMode = 'link';
+    applyDlMode();
+    $('filePicked').hidden = true;
+    $('dzWrap').hidden = false;
+    $('upProg').hidden = true;
+    $('upProg').classList.remove('prog-ind');
+    $('fileInput').value = '';
+    setBtnBusy($('btnPubSubmit'), false);
+    S.busy = false;
+  }
+
+  function applyDlMode() {
+    var isLink = S.dlMode === 'link';
+    $('linkFld').hidden = !isLink;
+    $('fileFld').hidden = isLink;
+    var bs = $('dlModeSeg').querySelectorAll('button');
+    for (var i = 0; i < bs.length; i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-mode') === S.dlMode);
+  }
+
+  function pickFile(f) {
+    if (!f) return;
+    var max = (Number(CFG.MAX_UPLOAD_MB) || 50) * 1048576;
+    if (f.size > max) {
+      toast('这个文件有 ' + fmtSize(f.size) + '，超过免费版单文件上限 ' + (CFG.MAX_UPLOAD_MB || 50) + ' MB。请改用「粘贴下载链接」方式，把文件传到网盘再填链接。', 'err');
+      return;
+    }
+    if (f.size === 0) { toast('这个文件是空的，无法上传', 'warn'); return; }
+    S.picked = f;
+    $('pickedName').textContent = f.name;
+    $('pickedSize').textContent = fmtSize(f.size);
+    $('dzWrap').hidden = true;
+    $('filePicked').hidden = false;
+    if (!$('pSize').value.trim()) $('pSize').value = fmtSize(f.size);
+  }
+
+  function safeStorageName(f) {
+    var raw = String(f.name || 'file').replace(/[\\/:*?"<>|\u0000-\u001f]/g, '_');
+    if (raw.length > 90) {
+      var dot = raw.lastIndexOf('.');
+      var ext = dot > raw.length - 12 ? raw.slice(dot) : '';
+      raw = raw.slice(0, 90 - ext.length) + ext;
+    }
+    var stamp = Date.now().toString(36);
+    var rand = Math.random().toString(36).slice(2, 8);
+    return S.user.id.slice(0, 8) + '/' + stamp + '-' + rand + '-' + raw;
+  }
+
+  function submitPublish() {
+    if (S.busy) return;
+    if (!S.user) { toast('请先登录', 'warn'); openAuth('login'); return; }
+
+    var name = $('pName').value.trim();
+    var desc = $('pDesc').value.trim();
+    var cat = $('pCat').value;
+    var plat = $('pPlat').value;
+    var ver = $('pVer').value.trim();
+    var sizeText = $('pSize').value.trim();
+    var link = $('pLink').value.trim();
+
+    if (name.length < 2) { toast('请填写软件名称（至少 2 个字）', 'warn'); $('pName').focus(); return; }
+    if (desc.length < 5) { toast('简介至少写 5 个字，让大家知道这软件能做什么', 'warn'); $('pDesc').focus(); return; }
+
+    var isLink = S.dlMode === 'link';
+    if (isLink) {
+      if (!isSafeUrl(link)) { toast('请填写完整的下载链接，要以 http:// 或 https:// 开头', 'warn'); $('pLink').focus(); return; }
+    } else if (!S.picked) {
+      toast('请选择要上传的安装文件，或改用「粘贴下载链接」', 'warn');
+      return;
+    }
+
+    S.busy = true;
+    var btn = $('btnPubSubmit');
+
+    var doInsert = function (payload) {
+      payload.user_id = S.user.id;
+      return sb.from('software').insert([payload]).select('*, profiles(nickname)').single().then(function (res) {
+        if (res.error) throw res.error;
+        return flatten([res.data])[0];
+      });
+    };
+
+    var chain;
+    if (isLink) {
+      setBtnBusy(btn, true, '发布中…');
+      chain = doInsert({
+        name: name, description: desc, category: cat, platform: plat,
+        version: ver, size_text: sizeText, size_bytes: 0,
+        download_type: 'link', download_url: link, storage_path: '', file_name: ''
+      });
+    } else {
+      setBtnBusy(btn, true, '上传文件中…');
+      var path = safeStorageName(S.picked);
+      $('upProg').hidden = false;
+      $('upProg').classList.add('prog-ind');
+      chain = S.picked.arrayBuffer().then(function (buf) {
+        return sb.storage.from(CFG.STORAGE_BUCKET).upload(path, buf, {
+          contentType: S.picked.type || 'application/octet-stream',
+          upsert: false
+        });
+      }).then(function (up) {
+        if (up.error) throw up.error;
+        $('upProg').classList.remove('prog-ind');
+        $('upProgI').style.width = '100%';
+        setBtnBusy(btn, true, '写入记录…');
+        return doInsert({
+          name: name, description: desc, category: cat, platform: plat,
+          version: ver, size_text: sizeText || fmtSize(S.picked.size), size_bytes: S.picked.size,
+          download_type: 'file', download_url: '', storage_path: path, file_name: S.picked.name
+        });
+      });
+    }
+
+    chain.then(function (row) {
+      S.items.unshift(row);
+      S.busy = false;
+      setBtnBusy(btn, false);
+      $('upProg').classList.remove('prog-ind');
+      $('upProgI').style.width = '0';
+      hideModal('mskPublish');
+      resetPubForm();
+      renderStats();
+      renderPlatOptions();
+      renderChips();
+      S.shown = PAGE_SIZE;
+      if (S.view !== 'library') { S.view = 'library'; renderView(); } else renderList();
+      toast('发布成功！「' + row.name + '」已经出现在软件库最前面', 'ok');
+    }).catch(function (err) {
+      S.busy = false;
+      setBtnBusy(btn, false);
+      $('upProg').classList.remove('prog-ind');
+      toast('发布失败：' + errHint(err), 'err');
+    });
+  }
+
+  /* SECTION: bindings */
+  function fillSelects() {
+    var pc = $('pCat'), pp = $('pPlat');
+    CATS.forEach(function (c) { pc.appendChild(el('option', { value: c }, c)); });
+    pc.value = CATS[0];
+    PLATS.forEach(function (p) { pp.appendChild(el('option', { value: p }, p)); });
+    pp.value = 'Windows';
+    // 平台筛选下拉框的选项由 renderPlatOptions 依据实际数据生成，此处不重复添加
+    $('maxSizeLabel').textContent = (CFG.MAX_UPLOAD_MB || 50) + ' MB';
+  }
+
+  function bind() {
+    $('logoHome').addEventListener('click', function (e) { e.preventDefault(); S.view = 'library'; renderView(); });
+
+    var navs = document.querySelectorAll('.nav-btn');
+    for (var i = 0; i < navs.length; i++) {
+      navs[i].addEventListener('click', function () { S.view = this.getAttribute('data-view'); renderView(); });
+    }
+
+    var st = null;
+    $('searchInput').addEventListener('input', function () {
+      var v = this.value;
+      $('btnClearSearch').hidden = !v;
+      clearTimeout(st);
+      st = setTimeout(function () { S.q = v; S.shown = PAGE_SIZE; renderList(); }, 200);
+    });
+    $('btnClearSearch').addEventListener('click', function () {
+      $('searchInput').value = ''; S.q = ''; this.hidden = true; S.shown = PAGE_SIZE; renderList(); $('searchInput').focus();
+    });
+    $('platSel').addEventListener('change', function () { S.plat = this.value; S.shown = PAGE_SIZE; renderList(); });
+    $('sortSel').addEventListener('change', function () { S.sort = this.value; S.shown = PAGE_SIZE; renderList(); });
+    $('btnMore').addEventListener('click', function () { S.shown += PAGE_SIZE; renderList(); });
+
+    $('btnPublish').addEventListener('click', function () { tryPublish(); });
+    $('btnAuth').addEventListener('click', function () { openAuth('login'); });
+    $('btnLogout').addEventListener('click', function () {
+      askConfirm('退出登录', '退出后需要重新输入邮箱密码才能发布软件。确定退出吗？', doLogout);
+    });
+
+    $('tabLogin').addEventListener('click', function () { S.authMode = 'login'; applyAuthMode(); });
+    $('tabSignup').addEventListener('click', function () { S.authMode = 'signup'; applyAuthMode(); });
+    $('btnAuthSubmit').addEventListener('click', submitAuth);
+    $('authForm').addEventListener('submit', function (e) { e.preventDefault(); submitAuth(); });
+    $('authForm').addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); submitAuth(); } });
+
+    var segs = $('dlModeSeg').querySelectorAll('button');
+    for (var j = 0; j < segs.length; j++) {
+      segs[j].addEventListener('click', function () { S.dlMode = this.getAttribute('data-mode'); applyDlMode(); });
+    }
+
+    $('btnPubSubmit').addEventListener('click', submitPublish);
+    $('pubForm').addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); submitPublish(); } });
+    $('pDesc').addEventListener('input', function () { $('descCount').textContent = String(this.value.length); });
+
+    var dz = $('dropzone'), fi = $('fileInput');
+    dz.addEventListener('click', function () { fi.click(); });
+    dz.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fi.click(); } });
+    fi.addEventListener('change', function () { if (this.files && this.files[0]) pickFile(this.files[0]); });
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      dz.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); dz.classList.add('over'); });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+      dz.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); dz.classList.remove('over'); });
+    });
+    dz.addEventListener('drop', function (e) {
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (f) pickFile(f);
+    });
+    $('btnClearFile').addEventListener('click', function () {
+      S.picked = null;
+      fi.value = '';
+      $('filePicked').hidden = true;
+      $('dzWrap').hidden = false;
+      $('upProg').hidden = true;
+      $('upProgI').style.width = '0';
+    });
+  }
+
+  /* SECTION: boot */
+  function boot() {
+    if (!isConfigured()) {
+      $('setupScreen').hidden = false;
+      return;
+    }
+    if (typeof window.supabase === 'undefined' || !window.supabase.createClient) {
+      $('setupScreen').hidden = false;
+      var p = document.querySelector('.setup-box p');
+      if (p) p.textContent = '浏览器没能加载 Supabase 运行库，请检查网络是否能访问 cdn.jsdelivr.net，然后刷新页面重试。';
+      return;
+    }
+
+    try {
+      sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
+      });
+    } catch (e) {
+      $('setupScreen').hidden = false;
+      return;
+    }
+
+    fillSelects();
+    bind();
+    $('app').hidden = false;
+    renderChips();
+    renderAuth();
+    S.loading = true;
+    renderList();
+
+    loadMe().then(function () {
+      renderAuth();
+      return loadItems();
+    }).then(function () {
+      S.ready = true;
+      renderChips();
+      if (S.view === 'mine') renderMine();
+    }).catch(function (err) {
+      $('app').hidden = true;
+      $('setupScreen').hidden = false;
+      var p = document.querySelector('.setup-box p');
+      if (p) p.textContent = '连接数据库失败：' + errHint(err);
+    });
+
+    sb.auth.onAuthStateChange(function (event, session) {
+      if (event === 'SIGNED_OUT') { S.user = null; S.nickname = ''; }
+      else if (session && session.user) {
+        S.user = session.user;
+        if (!S.nickname) {
+          sb.from('profiles').select('nickname').eq('id', session.user.id).maybeSingle().then(function (r) {
+            S.nickname = (r.data && r.data.nickname) || '匿名发布者';
+            renderAuth();
+          });
+        }
+      }
+      renderAuth();
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+
+</script>
+</body>
+</html>

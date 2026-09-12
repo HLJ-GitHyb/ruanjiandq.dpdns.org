@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件大全 · 人人可发布，人人可下载</title>
+<meta name="description" content="一个开放的软件分享平台，任何人都能发布软件，任何人都能免费下载。">
+<!-- SECTION: supabase-sdk -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+/* SECTION: variables */
+:root{
+  --bg:#0b1020;
+  --bg-soft:#111a30;
+  --card:#151f38;
+  --card-hover:#1a2647;
+  --line:#25324f;
+  --line-soft:#1d2942;
+  --txt:#e8edf9;
+  --txt-2:#a3b0cc;
+  --txt-3:#6f7d9c;
+  --acc:#22d3ee;
+  --acc-2:#3b82f6;
+  --acc-soft:rgba(34,211,238,.12);
+  --ok:#34d399;
+  --warn:#fbbf24;
+  --err:#f87171;
+  --r:14px;
+  --r-sm:9px;
+  --sh:0 8px 28px rgba(0,0,0,.35);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+}
+/* SECTION: reset */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--txt);
+  line-height:1.6;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(900px 420px at 12% -8%,rgba(59,130,246,.20),transparent 60%),
+    radial-gradient(760px 380px at 92% 4%,rgba(34,211,238,.14),transparent 62%);
+  background-attachment:fixed;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+a{color:var(--acc);text-decoration:none}
+ul{list-style:none}
+svg{display:block;flex:none}
+::selection{background:rgba(34,211,238,.28)}
+/* SECTION: scrollbar */
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#2a3855;border-radius:6px;border:2px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:#37486b}
+/* SECTION: layout */
+.wrap{width:100%;max-width:1180px;margin:0 auto;padding:0 20px}
+/* SECTION: header */
+.hdr{
+  position:sticky;top:0;z-index:60;
+  background:rgba(11,16,32,.86);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line-soft);
+}
+.hdr-in{display:flex;align-items:center;gap:14px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;flex:none;font-weight:700;font-size:18px;letter-spacing:.3px}
+.logo-badge{
+  width:34px;height:34px;border-radius:9px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--acc),var(--acc-2));
+  box-shadow:0 4px 14px rgba(34,211,238,.32);
+}
+.logo-badge svg{width:19px;height:19px;color:#06121f}
+.logo em{font-style:normal;background:linear-gradient(92deg,var(--acc),#93c5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hdr-nav{display:flex;align-items:center;gap:4px;margin-left:6px}
+.nav-btn{
+  padding:7px 13px;border-radius:8px;color:var(--txt-2);font-size:14px;font-weight:500;
+  transition:background .16s,color .16s;white-space:nowrap;
+}
+.nav-btn:hover{background:rgba(255,255,255,.06);color:var(--txt)}
+.nav-btn.on{background:var(--acc-soft);color:var(--acc)}
+.hdr-sp{flex:1}
+.hdr-act{display:flex;align-items:center;gap:9px;flex:none}
+.me{display:flex;align-items:center;gap:9px}
+.me-avatar{
+  width:32px;height:32px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--acc),var(--acc-2));
+  color:#06121f;font-weight:700;font-size:14px;flex:none;
+}
+.me-name{font-size:14px;font-weight:600;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* SECTION: buttons */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:9px 16px;border-radius:9px;font-size:14px;font-weight:600;
+  transition:transform .12s,background .16s,box-shadow .16s,border-color .16s,opacity .16s;
+  white-space:nowrap;min-height:38px;
+}
+.btn svg{width:16px;height:16px}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-p{background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#06121f;box-shadow:0 4px 16px rgba(34,211,238,.26)}
+.btn-p:hover:not(:disabled){box-shadow:0 6px 22px rgba(34,211,238,.4)}
+.btn-g{background:rgba(255,255,255,.06);color:var(--txt);border:1px solid var(--line)}
+.btn-g:hover:not(:disabled){background:rgba(255,255,255,.1);border-color:#33436a}
+.btn-o{background:transparent;color:var(--txt-2);border:1px solid var(--line)}
+.btn-o:hover:not(:disabled){color:var(--txt);border-color:#33436a;background:rgba(255,255,255,.04)}
+.btn-d{background:rgba(248,113,113,.12);color:var(--err);border:1px solid rgba(248,113,113,.28)}
+.btn-d:hover:not(:disabled){background:rgba(248,113,113,.2)}
+.btn-sm{padding:6px 12px;font-size:13px;min-height:32px}
+.btn-block{width:100%}
+/* SECTION: hero */
+.hero{padding:40px 0 26px;text-align:center}
+.hero h1{font-size:clamp(26px,4.6vw,40px);font-weight:800;letter-spacing:-.5px;line-height:1.25}
+.hero h1 em{font-style:normal;background:linear-gradient(92deg,var(--acc),#93c5fd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:11px auto 0;max-width:600px;color:var(--txt-2);font-size:15px}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px}
+.stat{
+  background:rgba(21,31,56,.72);border:1px solid var(--line-soft);border-radius:11px;
+  padding:9px 18px;min-width:104px;text-align:center;
+}
+.stat b{display:block;font-size:19px;font-weight:800;color:var(--acc);line-height:1.3}
+.stat span{font-size:12px;color:var(--txt-3)}
+/* SECTION: searchbar */
+.sbar{
+  display:flex;gap:10px;align-items:center;margin:0 auto 20px;max-width:660px;
+  background:var(--card);border:1px solid var(--line);border-radius:13px;padding:6px 6px 6px 15px;
+  transition:border-color .18s,box-shadow .18s;
+}
+.sbar:focus-within{border-color:rgba(34,211,238,.55);box-shadow:0 0 0 3px rgba(34,211,238,.12)}
+.sbar svg.si{width:18px;height:18px;color:var(--txt-3);flex:none}
+.sbar input{flex:1;min-width:0;background:none;border:none;outline:none;padding:8px 0;font-size:15px}
+.sbar input::placeholder{color:var(--txt-3)}
+/* SECTION: toolbar */
+.tbar{
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  padding-bottom:16px;margin-bottom:20px;border-bottom:1px solid var(--line-soft);
+}
+.chips{display:flex;gap:7px;flex-wrap:wrap;flex:1;min-width:0}
+.chip{
+  padding:6px 13px;border-radius:999px;font-size:13px;font-weight:500;
+  background:rgba(255,255,255,.045);border:1px solid var(--line);color:var(--txt-2);
+  transition:all .16s;white-space:nowrap;
+}
+.chip:hover{color:var(--txt);border-color:#33436a;background:rgba(255,255,255,.08)}
+.chip.on{background:var(--acc-soft);border-color:rgba(34,211,238,.42);color:var(--acc);font-weight:600}
+.sel{
+  background:var(--card);border:1px solid var(--line);border-radius:9px;
+  padding:7px 11px;font-size:13px;color:var(--txt-2);outline:none;cursor:pointer;min-height:34px;
+}
+.sel:focus{border-color:rgba(34,211,238,.5)}
+.sel option{background:var(--bg-soft);color:var(--txt)}
+/* SECTION: grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
+.card{
+  background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);
+  padding:17px;display:flex;flex-direction:column;gap:11px;
+  transition:transform .16s,border-color .16s,background .16s,box-shadow .16s;
+  position:relative;overflow:hidden;
+}
+.card::after{
+  content:"";position:absolute;inset:0 0 auto 0;height:2px;
+  background:linear-gradient(90deg,var(--acc),var(--acc-2));
+  opacity:0;transition:opacity .2s;
+}
+.card:hover{transform:translateY(-3px);border-color:#2e3d5e;background:var(--card-hover);box-shadow:var(--sh)}
+.card:hover::after{opacity:1}
+.card-top{display:flex;gap:12px;align-items:flex-start}
+.ico{
+  width:46px;height:46px;border-radius:11px;flex:none;display:grid;place-items:center;
+  font-size:19px;font-weight:800;color:#06121f;letter-spacing:-.5px;
+}
+.card-tt{min-width:0;flex:1}
+.card-name{
+  font-size:15.5px;font-weight:700;line-height:1.35;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-word;
+}
+.card-ver{font-size:12px;color:var(--txt-3);margin-top:2px}
+.card-desc{
+  font-size:13px;color:var(--txt-2);line-height:1.55;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-word;min-height:20px;
+}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{
+  font-size:11.5px;padding:3px 9px;border-radius:6px;font-weight:500;
+  background:rgba(255,255,255,.05);color:var(--txt-2);border:1px solid var(--line-soft);
+}
+.tag.cat{background:var(--acc-soft);color:var(--acc);border-color:rgba(34,211,238,.2)}
+.card-ft{display:flex;align-items:center;gap:9px;margin-top:auto;padding-top:11px;border-top:1px solid var(--line-soft)}
+.meta{font-size:12px;color:var(--txt-3);display:flex;align-items:center;gap:4px;min-width:0}
+.meta svg{width:13px;height:13px}
+.meta .who{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:82px}
+.card-ft .btn{margin-left:auto}
+/* SECTION: skeleton */
+.sk{background:var(--card);border:1px solid var(--line-soft);border-radius:var(--r);padding:17px}
+.sk-l{background:linear-gradient(90deg,#1a2540 25%,#22304f 50%,#1a2540 75%);background-size:200% 100%;animation:sh 1.25s infinite;border-radius:6px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk-ico{width:46px;height:46px;border-radius:11px}
+.sk-t{height:15px;width:62%}
+.sk-s{height:11px;width:38%;margin-top:7px}
+.sk-b{height:36px;margin-top:15px}
+/* SECTION: empty */
+.empty{text-align:center;padding:62px 20px;color:var(--txt-3)}
+.empty-ic{
+  width:66px;height:66px;margin:0 auto 16px;border-radius:18px;display:grid;place-items:center;
+  background:rgba(255,255,255,.04);border:1px solid var(--line-soft);
+}
+.empty-ic svg{width:30px;height:30px;color:var(--txt-3)}
+.empty h3{font-size:16.5px;color:var(--txt);font-weight:650;margin-bottom:6px}
+.empty p{font-size:13.5px;max-width:400px;margin:0 auto}
+.empty .btn{margin-top:18px}
+/* SECTION: loadmore */
+.more{display:flex;justify-content:center;padding:26px 0 8px}
+/* SECTION: footer */
+.ftr{
+  margin-top:52px;padding:24px 0;border-top:1px solid var(--line-soft);
+  text-align:center;color:var(--txt-3);font-size:12.5px;line-height:1.9;
+}
+.ftr a{color:var(--txt-2)}
+.ftr a:hover{color:var(--acc)}
+/* SECTION: modal */
+.msk{
+  position:fixed;inset:0;z-index:100;background:rgba(5,8,18,.76);
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:24px 16px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s;
+}
+.msk.on{opacity:1;visibility:visible}
+.mdl{
+  background:var(--bg-soft);border:1px solid var(--line);border-radius:16px;
+  width:100%;max-width:520px;margin:auto;box-shadow:0 24px 64px rgba(0,0,0,.6);
+  transform:translateY(14px) scale(.985);transition:transform .22s cubic-bezier(.2,.8,.3,1);
+  position:relative;
+}
+.msk.on .mdl{transform:none}
+.mdl-hd{display:flex;align-items:flex-start;gap:12px;padding:19px 20px 15px;border-bottom:1px solid var(--line-soft)}
+.mdl-hd h2{font-size:17px;font-weight:700;line-height:1.4}
+.mdl-hd p{font-size:12.8px;color:var(--txt-3);margin-top:3px}
+.mdl-x{
+  margin-left:auto;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
+  color:var(--txt-3);transition:all .16s;flex:none;
+}
+.mdl-x:hover{background:rgba(255,255,255,.08);color:var(--txt)}
+.mdl-x svg{width:16px;height:16px}
+.mdl-bd{padding:18px 20px}
+.mdl-ft{padding:14px 20px 19px;display:flex;gap:9px;justify-content:flex-end;flex-wrap:wrap}
+/* SECTION: form */
+.fld{margin-bottom:14px}
+.fld:last-child{margin-bottom:0}
+.lbl{display:block;font-size:13px;font-weight:600;color:var(--txt-2);margin-bottom:6px}
+.lbl .req{color:var(--acc);margin-left:2px}
+.lbl .opt{color:var(--txt-3);font-weight:400;font-size:12px;margin-left:4px}
+.inp{
+  width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:9px 12px;font-size:14px;outline:none;transition:border-color .16s,box-shadow .16s;
+}
+.inp:focus{border-color:rgba(34,211,238,.55);box-shadow:0 0 0 3px rgba(34,211,238,.1)}
+.inp::placeholder{color:var(--txt-3)}
+textarea.inp{resize:vertical;min-height:84px;line-height:1.6}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.hint{font-size:11.8px;color:var(--txt-3);margin-top:5px;line-height:1.5}
+.hint.err{color:var(--err)}
+/* SECTION: segmented */
+.seg{display:flex;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:4px}
+.seg button{
+  flex:1;padding:7px 10px;border-radius:6px;font-size:13px;font-weight:600;color:var(--txt-3);
+  transition:all .16s;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.seg button svg{width:14px;height:14px}
+.seg button:hover{color:var(--txt-2)}
+.seg button.on{background:var(--acc-soft);color:var(--acc)}
+/* SECTION: tabs */
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:4px;margin-bottom:17px}
+.tabs button{flex:1;padding:8px;border-radius:6px;font-size:13.5px;font-weight:600;color:var(--txt-3);transition:all .16s}
+.tabs button.on{background:linear-gradient(135deg,var(--acc),var(--acc-2));color:#06121f}
+/* SECTION: dropzone */
+.dz{
+  border:2px dashed var(--line);border-radius:var(--r-sm);padding:22px 16px;text-align:center;
+  transition:all .18s;cursor:pointer;background:rgba(21,31,56,.5);
+}
+.dz:hover,.dz.over{border-color:rgba(34,211,238,.55);background:var(--acc-soft)}
+.dz svg{width:26px;height:26px;color:var(--txt-3);margin:0 auto 8px}
+.dz.over svg{color:var(--acc)}
+.dz-t{font-size:13.5px;color:var(--txt-2);font-weight:500}
+.dz-t b{color:var(--acc)}
+.dz-s{font-size:11.8px;color:var(--txt-3);margin-top:3px}
+.fsel{
+  display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid rgba(52,211,153,.32);
+  border-radius:var(--r-sm);padding:11px 13px;
+}
+.fsel-ic{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:rgba(52,211,153,.14);flex:none}
+.fsel-ic svg{width:17px;height:17px;color:var(--ok)}
+.fsel-t{min-width:0;flex:1}
+.fsel-n{font-size:13.2px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fsel-s{font-size:11.5px;color:var(--txt-3)}
+.fsel-x{width:26px;height:26px;border-radius:6px;display:grid;place-items:center;color:var(--txt-3);transition:all .16s;flex:none}
+.fsel-x:hover{background:rgba(248,113,113,.14);color:var(--err)}
+.fsel-x svg{width:13px;height:13px}
+/* SECTION: progress */
+.prog{height:5px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:9px;position:relative}
+.prog-i{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc-2));border-radius:99px;width:0;transition:width .2s}
+.prog-ind .prog-i{width:38%;animation:ind 1.15s ease-in-out infinite}
+@keyframes ind{0%{margin-left:-38%}100%{margin-left:100%}}
+.spin{width:15px;height:15px;border:2px solid rgba(6,18,31,.3);border-top-color:#06121f;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* SECTION: detail */
+.dt-top{display:flex;gap:14px;align-items:flex-start;margin-bottom:15px}
+.dt-ico{width:60px;height:60px;border-radius:14px;font-size:25px;flex:none}
+.dt-name{font-size:19px;font-weight:750;line-height:1.35;word-break:break-word}
+.dt-sub{font-size:12.6px;color:var(--txt-3);margin-top:4px;display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.dt-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:9px;
+  background:var(--card);border:1px solid var(--line-soft);border-radius:11px;padding:13px;margin-bottom:15px;
+}
+.dt-cell span{display:block;font-size:11.3px;color:var(--txt-3);margin-bottom:2px}
+.dt-cell b{font-size:13.6px;font-weight:650;color:var(--txt);word-break:break-word}
+.dt-sec{margin-bottom:15px}
+.dt-sec h4{font-size:12.6px;color:var(--txt-3);font-weight:650;margin-bottom:7px;letter-spacing:.4px}
+.dt-desc{
+  font-size:13.8px;color:var(--txt-2);line-height:1.78;white-space:pre-wrap;word-break:break-word;
+  background:var(--card);border:1px solid var(--line-soft);border-radius:11px;padding:13px;
+  max-height:230px;overflow-y:auto;
+}
+.dt-warn{
+  display:flex;gap:9px;align-items:flex-start;font-size:12.2px;line-height:1.6;color:var(--warn);
+  background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.22);border-radius:10px;padding:10px 12px;
+}
+.dt-warn svg{width:15px;height:15px;margin-top:2px}
+/* SECTION: toast */
+.toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;width:calc(100% - 32px);max-width:400px;pointer-events:none}
+.toast{
+  display:flex;align-items:flex-start;gap:9px;padding:11px 14px;border-radius:11px;
+  background:var(--bg-soft);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5);
+  font-size:13.4px;line-height:1.5;pointer-events:auto;
+  animation:tin .26s cubic-bezier(.2,.8,.3,1);word-break:break-word;
+}
+.toast.out{animation:tout .22s forwards}
+@keyframes tin{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateY(-12px)}}
+.toast svg{width:16px;height:16px;margin-top:2px;flex:none}
+.toast.ok{border-color:rgba(52,211,153,.34)}.toast.ok svg{color:var(--ok)}
+.toast.err{border-color:rgba(248,113,113,.34)}.toast.err svg{color:var(--err)}
+.toast.warn{border-color:rgba(251,191,36,.34)}.toast.warn svg{color:var(--warn)}
+.toast.info svg{color:var(--acc)}
+/* SECTION: setup-screen */
+.setup{min-height:100vh;display:grid;place-items:center;padding:28px 18px}
+.setup-box{max-width:600px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:30px 26px;box-shadow:var(--sh)}
+.setup-box h1{font-size:20px;font-weight:750;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.setup-box h1 svg{width:22px;height:22px;color:var(--warn);flex:none}
+.setup-box>p{font-size:14px;color:var(--txt-2);margin-bottom:18px}
+.setup-steps{display:flex;flex-direction:column;gap:11px;margin-bottom:18px}
+.setup-step{display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,.035);border:1px solid var(--line-soft);border-radius:11px;padding:12px 14px}
+.setup-n{width:22px;height:22px;border-radius:50%;background:var(--acc-soft);color:var(--acc);font-size:12px;font-weight:750;display:grid;place-items:center;flex:none;margin-top:1px}
+.setup-step div{font-size:13.3px;color:var(--txt-2);line-height:1.62}
+.setup-step b{color:var(--txt)}
+code.k{background:rgba(34,211,238,.12);color:var(--acc);padding:1px 6px;border-radius:5px;font-size:12.4px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+/* SECTION: responsive */
+@media (max-width:860px){
+  .hdr-nav{display:none}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:13px}
+}
+@media (max-width:620px){
+  .wrap{padding:0 14px}
+  .hdr-in{height:58px;gap:9px}
+  .logo{font-size:16px}
+  .logo-badge{width:30px;height:30px;border-radius:8px}
+  .logo-badge svg{width:17px;height:17px}
+  .me-name{display:none}
+  .btn{padding:8px 13px;font-size:13.5px}
+  .hero{padding:26px 0 20px}
+  .hero p{font-size:14px}
+  .stats{gap:8px;margin-top:16px}
+  .stat{padding:7px 13px;min-width:88px}
+  .stat b{font-size:17px}
+  .sbar{padding:5px 5px 5px 13px;border-radius:11px}
+  .sbar input{font-size:14.5px}
+  .tbar{gap:9px;padding-bottom:13px;margin-bottom:16px}
+  .chips{order:2;width:100%;flex:none;flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .tbar .sel{flex:1}
+  .grid{grid-template-columns:1fr;gap:11px}
+  .card{padding:15px;gap:10px}
+  .ico{width:42px;height:42px;border-radius:10px;font-size:17.5px}
+  .msk{padding:0;align-items:flex-end}
+  .mdl{max-width:none;border-radius:16px 16px 0 0;margin:auto 0 0;border-bottom:none;transform:translateY(20px)}
+  .mdl-bd{padding:16px 16px}
+  .mdl-hd{padding:16px 16px 13px}
+  .mdl-ft{padding:12px 16px 18px}
+  .row2{grid-template-columns:1fr}
+  .dt-ico{width:52px;height:52px;border-radius:12px;font-size:21px}
+  .dt-name{font-size:17px}
+  .setup-box{padding:22px 17px}
+  .ftr{margin-top:36px;padding:20px 0}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+
+
+<!-- SECTION: app -->
+<div id="app" >
+
+  <!-- SECTION: header -->
+  <header class="hdr">
+    <div class="wrap hdr-in">
+      <a href="#" class="logo" id="logoHome" aria-label="返回首页">
+        <span class="logo-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </span>
+        <span>软件<em>大全</em></span>
+      </a>
+      <nav class="hdr-nav" aria-label="主导航">
+        <button class="nav-btn on" data-view="library" type="button">软件库</button>
+        <button class="nav-btn" data-view="mine" type="button">我的发布</button>
+      </nav>
+      <div class="hdr-sp"></div>
+      <div class="hdr-act">
+        <div class="me" id="meBox" hidden>
+          <span class="me-avatar" id="meAvatar">?</span>
+          <span class="me-name" id="meName"></span>
+        </div>
+        <button class="btn btn-p" id="btnPublish" data-primary-action type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>发布软件</span>
+        </button>
+        <button class="btn btn-g btn-sm" id="btnAuth" type="button">登录</button>
+        <button class="btn btn-o btn-sm" id="btnLogout" type="button" hidden>退出</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- SECTION: library-view -->
+    <section class="wrap" id="viewLibrary">
+      <div class="hero">
+        <h1>人人都能发布，<em>人人都能下载</em></h1>
+        <p>一个完全开放的软件分享平台。把你觉得好用的软件发上来，或者从这里找到别人分享的好工具。</p>
+        <div class="stats">
+          <div class="stat"><b id="stTotal">0</b><span>软件总数</span></div>
+          <div class="stat"><b id="stDown">0</b><span>累计下载</span></div>
+          <div class="stat"><b id="stUser">0</b><span>发布者</span></div>
+        </div>
+      </div>
+
+      <div class="sbar">
+        <svg class="si" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="searchInput" placeholder="搜索软件名称、简介或发布者…" autocomplete="off" aria-label="搜索软件">
+        <button class="btn btn-g btn-sm" id="btnClearSearch" type="button" hidden>清除</button>
+      </div>
+
+      <div class="tbar">
+        <div class="chips" id="catChips" role="group" aria-label="按分类筛选"></div>
+        <select class="sel" id="platSel" aria-label="按平台筛选">
+          <option value="">全部平台</option>
+        </select>
+        <select class="sel" id="sortSel" aria-label="排序方式">
+          <option value="new">最新发布</option>
+          <option value="hot">下载最多</option>
+          <option value="name">名称排序</option>
+        </select>
+      </div>
+
+      <div class="grid" id="grid"></div>
+      <div id="listState"></div>
+      <div class="more" id="moreBox" hidden>
+        <button class="btn btn-g" id="btnMore" type="button">加载更多</button>
+      </div>
+    </section>
+
+    <!-- SECTION: mine-view -->
+    <section class="wrap" id="viewMine" hidden style="padding-top:32px">
+      <div id="mineContent"></div>
+    </section>
+  </main>
+
+  <!-- SECTION: footer -->
+  <footer class="ftr">
+    <div class="wrap">
+      <div>软件大全 · 开放分享平台</div>
+      <div>本站仅提供用户自行发布的下载链接与文件，请务必自行核实软件来源与安全，下载后先杀毒再运行。</div>
+    </div>
+  </footer>
+</div>
+
+<!-- SECTION: modal-auth -->
+<div class="msk" id="mskAuth" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="mdl">
+    <div class="mdl-hd">
+      <div>
+        <h2 id="authTitle">登录</h2>
+        <p id="authSub">登录后即可发布和管理自己的软件</p>
+      </div>
+      <button class="mdl-x" data-close="mskAuth" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mdl-bd">
+      <div class="tabs">
+        <button type="button" id="tabLogin" class="on">登录</button>
+        <button type="button" id="tabSignup">注册</button>
+      </div>
+      <form id="authForm" novalidate>
+        <div class="fld" id="nickFld" hidden>
+          <label class="lbl" for="nickInput">昵称<span class="req">*</span></label>
+          <input class="inp" id="nickInput" type="text" maxlength="24" placeholder="别人会看到这个名字" autocomplete="nickname">
+          <div class="hint">2 到 24 个字符，会显示在你发布的软件上</div>
+        </div>
+        <div class="fld">
+          <label class="lbl" for="emailInput">邮箱<span class="req">*</span></label>
+          <input class="inp" id="emailInput" type="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+        <div class="fld">
+          <label class="lbl" for="passInput">密码<span class="req">*</span></label>
+          <input class="inp" id="passInput" type="password" placeholder="至少 6 位" autocomplete="current-password" minlength="6" required>
+          <div class="hint" id="passHint">忘记密码请联系站点管理员在后台重置</div>
+        </div>
+      </form>
+    </div>
+    <div class="mdl-ft">
+      <button class="btn btn-o" data-close="mskAuth" type="button">取消</button>
+      <button class="btn btn-p" id="btnAuthSubmit" data-primary-action type="button">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: modal-publish -->
+<div class="msk" id="mskPublish" role="dialog" aria-modal="true" aria-labelledby="pubTitle">
+  <div class="mdl" style="max-width:580px">
+    <div class="mdl-hd">
+      <div>
+        <h2 id="pubTitle">发布软件</h2>
+        <p>填写软件信息，选择上传文件或粘贴下载链接</p>
+      </div>
+      <button class="mdl-x" data-close="mskPublish" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mdl-bd">
+      <form id="pubForm" novalidate>
+        <div class="fld">
+          <label class="lbl" for="pName">软件名称<span class="req">*</span></label>
+          <input class="inp" id="pName" type="text" maxlength="80" placeholder="例如：Visual Studio Code" required>
+        </div>
+        <div class="row2">
+          <div class="fld">
+            <label class="lbl" for="pCat">分类<span class="req">*</span></label>
+            <select class="inp sel" id="pCat" style="width:100%"></select>
+          </div>
+          <div class="fld">
+            <label class="lbl" for="pPlat">运行平台<span class="req">*</span></label>
+            <select class="inp sel" id="pPlat" style="width:100%"></select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="fld">
+            <label class="lbl" for="pVer">版本号<span class="opt">选填</span></label>
+            <input class="inp" id="pVer" type="text" maxlength="24" placeholder="例如：1.95.0">
+          </div>
+          <div class="fld">
+            <label class="lbl" for="pSize">文件大小<span class="opt">选填</span></label>
+            <input class="inp" id="pSize" type="text" maxlength="20" placeholder="例如：98 MB">
+          </div>
+        </div>
+        <div class="fld">
+          <label class="lbl" for="pDesc">软件简介<span class="req">*</span></label>
+          <textarea class="inp" id="pDesc" maxlength="2000" rows="4" placeholder="这个软件是做什么的？有什么特色？适合谁用？" required></textarea>
+          <div class="hint"><span id="descCount">0</span> / 2000</div>
+        </div>
+
+        <div class="fld">
+          <span class="lbl">获取方式<span class="req">*</span></span>
+          <div class="seg" id="dlModeSeg">
+            <button type="button" data-mode="link" class="on">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              粘贴下载链接
+            </button>
+            <button type="button" data-mode="file">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              直接上传文件
+            </button>
+          </div>
+        </div>
+
+        <div class="fld" id="linkFld">
+          <label class="lbl" for="pLink">下载链接<span class="req">*</span></label>
+          <input class="inp" id="pLink" type="url" placeholder="https://…（网盘分享链接或官方直链）">
+          <div class="hint">推荐用网盘链接，不占用本站流量额度，且没有大小限制</div>
+        </div>
+
+        <div class="fld" id="fileFld" hidden>
+          <span class="lbl">安装文件<span class="req">*</span></span>
+          <div id="dzWrap">
+            <div class="dz" id="dropzone" role="button" tabindex="0" aria-label="选择或拖入要上传的文件">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <div class="dz-t">点击选择文件，或把文件<b>拖到这里</b></div>
+              <div class="dz-s">单个文件不超过 <b id="maxSizeLabel">50 MB</b>（免费版存储上限）</div>
+            </div>
+            <input type="file" id="fileInput" hidden>
+          </div>
+          <div id="filePicked" hidden>
+            <div class="fsel">
+              <span class="fsel-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </span>
+              <span class="fsel-t">
+                <span class="fsel-n" id="pickedName"></span>
+                <span class="fsel-s" id="pickedSize"></span>
+              </span>
+              <button class="fsel-x" id="btnClearFile" type="button" aria-label="移除已选文件">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div class="prog" id="upProg" hidden><div class="prog-i" id="upProgI"></div></div>
+          </div>
+          <div class="hint">大文件（超过 50 MB）请改用上面的「粘贴下载链接」方式</div>
+        </div>
+      </form>
+    </div>
+    <div class="mdl-ft">
+      <button class="btn btn-o" data-close="mskPublish" type="button">取消</button>
+      <button class="btn btn-p" id="btnPubSubmit" data-primary-action type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        发布
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: modal-detail -->
+<div class="msk" id="mskDetail" role="dialog" aria-modal="true" aria-labelledby="dtTitle">
+  <div class="mdl" style="max-width:580px">
+    <div class="mdl-hd">
+      <div style="min-width:0">
+        <h2 id="dtTitle">软件详情</h2>
+        <p>确认信息后点击下载</p>
+      </div>
+      <button class="mdl-x" data-close="mskDetail" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mdl-bd" id="detailBody"></div>
+    <div class="mdl-ft" id="detailFoot"></div>
+  </div>
+</div>
+
+<!-- SECTION: modal-confirm -->
+<div class="msk" id="mskConfirm" role="dialog" aria-modal="true" aria-labelledby="cfTitle">
+  <div class="mdl" style="max-width:400px">
+    <div class="mdl-hd">
+      <div><h2 id="cfTitle">确认操作</h2></div>
+      <button class="mdl-x" data-close="mskConfirm" type="button" aria-label="关闭">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="mdl-bd"><p id="cfText" style="font-size:14px;color:var(--txt-2);line-height:1.7"></p></div>
+    <div class="mdl-ft">
+      <button class="btn btn-o" data-close="mskConfirm" type="button">取消</button>
+      <button class="btn btn-d" id="btnConfirmOk" type="button">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: toasts -->
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="assets/app.js"></script>
+</body>
+</html>
